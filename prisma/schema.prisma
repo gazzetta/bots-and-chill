@@ -1,0 +1,88 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String       @id @default(uuid())
+  clerkId     String       @unique
+  email       String       @unique
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  apiKeys     ExchangeKey[]
+}
+
+model ExchangeKey {
+  id          String    @id @default(uuid())
+  userId      String
+  exchange    String    // e.g., "binance", "bybit"
+  name        String    // e.g., "Binance Spot Testnet"
+  apiKey      String
+  apiSecret   String
+  isTestnet   Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  user        User      @relation(fields: [userId], references: [id])
+
+  @@unique([userId, exchange, isTestnet])
+}
+
+model TradingPair {
+  id              String    @id @default(uuid())
+  exchange        String    // e.g., "binance", "bybit"
+  symbol          String    // e.g., "BTC/USDT"
+  baseAsset       String    // e.g., "BTC"
+  quoteAsset      String    // e.g., "USDT"
+  minQuantity     Float
+  maxQuantity     Float
+  stepSize        Float
+  minNotional     Float
+  isSpot          Boolean   @default(true)
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  bots            Bot[]
+
+  @@unique([exchange, symbol, isSpot])
+}
+
+model SystemConfig {
+  id              String    @id @default(uuid())
+  key             String    @unique
+  value           String
+  updatedAt       DateTime  @updatedAt
+
+  @@index([key])
+}
+
+model Bot {
+  id                    String   @id @default(cuid())
+  userId                String
+  pairId                String
+  baseOrderSize         Float
+  maxSafetyOrders      Int
+  priceDeviation       Float
+  safetyOrderSize      Float
+  safetyOrderPriceStep Float
+  safetyOrderVolumeStep Float
+  takeProfit           Float
+  mode                 String   // 'normal' or 'reverse'
+  status               String   // 'running', 'stopped', etc.
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  pair TradingPair @relation(fields: [pairId], references: [id])
+
+  @@index([userId])
+  @@index([pairId])
+}
