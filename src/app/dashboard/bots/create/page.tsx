@@ -20,6 +20,7 @@ import {
   Alert,
 } from '@mui/material';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import { ExchangeKey } from '@prisma/client';
 
 interface TradingPair {
   id: string;
@@ -35,6 +36,7 @@ interface TradingPair {
 
 interface FormData {
   pair: TradingPair | null;
+  exchangeKey: ExchangeKey | null;
   baseOrderSize: number;
   maxSafetyOrders: number;
   priceDeviation: number;
@@ -128,27 +130,64 @@ const FormFieldWithTooltip = ({
   );
 };
 
+const validateBotName = (name: string) => {
+  const regex = /^[a-zA-Z0-9\s._]+$/;
+  return regex.test(name);
+};
+
 export default function CreateBotPage() {
   const [pairs, setPairs] = useState<TradingPair[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showComingSoon, setShowComingSoon] = useState(false);
+  const [exchangeKeys, setExchangeKeys] = useState<ExchangeKey[]>([]);
   
   const [formData, setFormData] = useState<FormData>({
     pair: null,
-    baseOrderSize: 20,
-    maxSafetyOrders: 13,
-    priceDeviation: 1,
-    safetyOrderSize: 40,
-    safetyOrderPriceStep: 1.07,
-    safetyOrderVolumeStep: 1.5,
-    takeProfit: 3,
+    exchangeKey: null,
+    baseOrderSize: 10,
+    maxSafetyOrders: 5,
+    priceDeviation: 1.5,
+    safetyOrderSize: 15,
+    safetyOrderPriceStep: 1.05,
+    safetyOrderVolumeStep: 1.1,
+    takeProfit: 2,
     mode: 'normal'
   });
 
+  const [botName, setBotName] = useState('');
+  const [nameError, setNameError] = useState('');
+
+  // Add loading state for initial exchange keys fetch
+  const [loadingExchangeKeys, setLoadingExchangeKeys] = useState(true);
+
   useEffect(() => {
-    if (searchTerm.length < 3) {
+    const fetchExchangeKeys = async () => {
+      try {
+        setLoadingExchangeKeys(true);
+        const response = await fetch('/api/exchanges');
+        const data = await response.json();
+        if (data.success) {
+          setExchangeKeys(data.exchanges);
+          // If user has only one exchange key, preselect it
+          if (data.exchanges.length === 1) {
+            setFormData(prev => ({ ...prev, exchangeKey: data.exchanges[0] }));
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch exchange keys:', error);
+      } finally {
+        setLoadingExchangeKeys(false);
+      }
+    };
+
+    fetchExchangeKeys();
+  }, []);
+
+  // Modify pairs fetching to include exchange filter
+  useEffect(() => {
+    if (searchTerm.length < 3 || !formData.exchangeKey) {
       setPairs([]);
       return;
     }
@@ -156,7 +195,7 @@ export default function CreateBotPage() {
     const timer = setTimeout(async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/trading-pairs/search?q=${searchTerm}`);
+        const response = await fetch(`/api/trading-pairs/search?q=${searchTerm}&exchange=${formData.exchangeKey.exchange}`);
         const data = await response.json();
         
         if (data.success) {
@@ -172,13 +211,34 @@ export default function CreateBotPage() {
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [searchTerm]);
+  }, [searchTerm, formData.exchangeKey]);
+
+  // Add handler for exchange change
+  const handleExchangeChange = (newExchangeKey: ExchangeKey | null) => {
+    setFormData(prev => ({
+      ...prev,
+      exchangeKey: newExchangeKey,
+      pair: null, // Reset pair when exchange changes
+    }));
+    setPairs([]); // Clear pairs list
+    setSearchTerm(''); // Clear search term
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!formData.pair) {
       setError('Please select a trading pair');
+      return;
+    }
+
+    if (!formData.exchangeKey) {
+      setError('Please select an exchange');
+      return;
+    }
+
+    if (!botName) {
+      setError('Bot name is required');
       return;
     }
 
@@ -191,7 +251,8 @@ export default function CreateBotPage() {
         },
         body: JSON.stringify({
           ...formData,
-          // Ensure all numbers are properly formatted before sending
+          name: botName,
+          exchangeKey: formData.exchangeKey,
           baseOrderSize: Number(formData.baseOrderSize.toFixed(8)),
           maxSafetyOrders: Math.floor(formData.maxSafetyOrders),
           priceDeviation: Number(formData.priceDeviation.toFixed(2)),
@@ -205,8 +266,7 @@ export default function CreateBotPage() {
       const data = await response.json();
 
       if (data.success) {
-        // Redirect to bots list page
-        window.location.href = '/dashboard/bots';
+        window.location.href = `/dashboard/bots/success?id=${data.bot.id}`;
       } else {
         setError(data.error || 'Failed to create bot');
       }
@@ -231,6 +291,9 @@ export default function CreateBotPage() {
   const isFormValid = () => {
     return (
       formData.pair !== null &&
+      formData.exchangeKey !== null &&
+      botName.trim() !== '' &&
+      !nameError &&
       formData.baseOrderSize > 0 &&
       formData.maxSafetyOrders > 0 &&
       formData.priceDeviation > 0 &&
@@ -240,6 +303,17 @@ export default function CreateBotPage() {
       formData.takeProfit > 0
     );
   };
+
+  useEffect(() => {
+    // Check for cloned data
+    const clonedData = sessionStorage.getItem('cloneBotData');
+    if (clonedData) {
+      const parsedData = JSON.parse(clonedData);
+      setFormData(parsedData);
+      // Clear the stored data
+      sessionStorage.removeItem('cloneBotData');
+    }
+  }, []);
 
   return (
     <Box>
@@ -262,19 +336,43 @@ export default function CreateBotPage() {
 
             <Autocomplete
               fullWidth
+              options={exchangeKeys}
+              getOptionLabel={(option) => option.name}
+              value={formData.exchangeKey}
+              onChange={(_, newValue) => handleExchangeChange(newValue)}
+              loading={loadingExchangeKeys}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Exchange"
+                  required
+                  error={!!error}
+                  helperText={error || 'Select exchange to use'}
+                />
+              )}
+            />
+
+            <Autocomplete
+              fullWidth
               options={pairs}
               loading={loading}
               getOptionLabel={(option) => option.symbol}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               onChange={(_, newValue) => setFormData({ ...formData, pair: newValue })}
               onInputChange={(_, value) => setSearchTerm(value)}
+              disabled={!formData.exchangeKey} // Disable if no exchange selected
+              value={formData.pair}
               renderInput={(params) => (
                 <TextField
                   {...params}
                   label="Trading Pair"
                   required
                   error={!!error}
-                  helperText={error || 'Start typing to search (min 3 characters)'}
+                  helperText={
+                    !formData.exchangeKey 
+                      ? 'Select an exchange first'
+                      : error || 'Start typing to search (min 3 characters)'
+                  }
                 />
               )}
             />
@@ -337,6 +435,24 @@ export default function CreateBotPage() {
               tooltip={tooltips.takeProfit}
               endAdornment="%"
               maxDecimals={2}
+            />
+
+            <TextField
+              label="Bot Name"
+              value={botName}
+              error={!!nameError}
+              helperText={nameError || "Only letters, numbers, spaces, dots and underscores allowed"}
+              onChange={(e) => {
+                const value = e.target.value;
+                setBotName(value);
+                if (!validateBotName(value)) {
+                  setNameError('Invalid bot name format');
+                } else {
+                  setNameError('');
+                }
+              }}
+              fullWidth
+              sx={{ mb: 2 }}
             />
 
             <Button

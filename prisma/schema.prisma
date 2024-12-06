@@ -33,6 +33,7 @@ model ExchangeKey {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   user        User      @relation(fields: [userId], references: [id])
+  bots        Bot[]
 
   @@unique([userId, exchange, isTestnet])
 }
@@ -68,21 +69,122 @@ model SystemConfig {
 model Bot {
   id                    String   @id @default(cuid())
   userId                String
+  name                  String
   pairId                String
+  exchangeKeyId         String
   baseOrderSize         Float
   maxSafetyOrders      Int
   priceDeviation       Float
   safetyOrderSize      Float
-  safetyOrderPriceStep Float
+  safetyOrderPriceStep  Float
   safetyOrderVolumeStep Float
-  takeProfit           Float
+  takeProfit            Float
   mode                 String   // 'normal' or 'reverse'
   status               String   // 'running', 'stopped', etc.
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
+  deals                 Deal[]
 
-  pair TradingPair @relation(fields: [pairId], references: [id])
+  pair        TradingPair @relation(fields: [pairId], references: [id])
+  exchangeKey ExchangeKey @relation(fields: [exchangeKeyId], references: [id])
 
   @@index([userId])
   @@index([pairId])
+  @@index([exchangeKeyId])
+}
+
+model Deal {
+  id              String      @id @default(cuid())
+  botId           String      
+  bot             Bot         @relation(fields: [botId], references: [id])
+  status          DealStatus  @default(PENDING)
+  startedAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  closedAt        DateTime?   
+
+  // All orders in this deal
+  orders          Order[]     @relation("DealOrders")
+  
+  // Current Position Info
+  currentQuantity  Float    
+  averagePrice     Float    
+  totalCost        Float    
+  currentProfit    Float    
+  
+  // Deal History
+  histories       DealHistory[]
+
+  @@index([botId])
+}
+
+model Order {
+  id              String      @id
+  dealId          String
+  deal            Deal        @relation("DealOrders", fields: [dealId], references: [id])
+  type            OrderType   
+  side            OrderSide   
+  status          OrderStatus @default(PENDING)
+  symbol          String      
+  quantity        Float       
+  price           Float       
+  filled          Float       
+  remaining       Float       
+  cost            Float       
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  filledAt        DateTime?   
+  exchangeOrderId  String    
+
+  @@index([dealId])
+}
+
+model DealHistory {
+  id          String      @id @default(cuid())
+  dealId      String
+  deal        Deal        @relation(fields: [dealId], references: [id])
+  type        HistoryType
+  orderId     String?     
+  oldValue    Json?       
+  newValue    Json        
+  timestamp   DateTime    @default(now())
+
+  @@index([dealId])
+}
+
+enum DealStatus {
+  PENDING     // Just created, waiting for orders to be placed
+  ACTIVE      // Base order placed successfully
+  COMPLETED   // Take profit hit or manually closed
+  FAILED      // Error occurred during setup
+  CANCELLED   // Manually cancelled before completion
+}
+
+enum OrderType {
+  BASE
+  SAFETY
+  TAKE_PROFIT
+}
+
+enum OrderStatus {
+  PENDING     // Just created
+  PLACED      // Successfully placed on exchange
+  PARTIALLY_FILLED
+  FILLED
+  CANCELLED
+  FAILED
+}
+
+enum OrderSide {
+  BUY
+  SELL
+}
+
+enum HistoryType {
+  DEAL_CREATED
+  ORDER_PLACED
+  ORDER_FILLED
+  SAFETY_ORDER_TRIGGERED
+  TP_UPDATED
+  DEAL_CLOSED
+  ERROR
 }

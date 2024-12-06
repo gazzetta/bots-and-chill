@@ -5,6 +5,7 @@ import { Box, AppBar, Toolbar, Typography, IconButton } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
+import { UserButton } from '@clerk/nextjs';
 import { useColorMode } from '@/hooks/useColorMode';
 import Sidebar from '@/components/layout/Sidebar';
 
@@ -67,11 +68,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </Typography>
             <IconButton 
               onClick={toggleColorMode}
-              color="inherit"
-              sx={{ color: 'text.primary' }}
+              color="text.primary"
+              sx={{ mr: 2 }}
             >
               {mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
             </IconButton>
+            <UserButton afterSignOutUrl="/" />
           </Toolbar>
         </AppBar>
 

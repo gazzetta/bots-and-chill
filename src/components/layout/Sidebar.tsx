@@ -1,23 +1,27 @@
 'use client';
 
+import { useState } from 'react';
 import {
   Drawer,
-  Box,
   List,
   ListItem,
-  ListItemButton,
   ListItemIcon,
   ListItemText,
+  ListItemButton,
+  Collapse,
   IconButton,
+  Box,
   useTheme,
 } from '@mui/material';
 import {
-  ChevronLeft as ChevronLeftIcon,
-  ChevronRight as ChevronRightIcon,
   Dashboard as DashboardIcon,
-  ShowChart as ShowChartIcon,
-  AccountBalanceWallet as AccountBalanceWalletIcon,
+  TrendingUp as TradingBotsIcon,
+  AccountBalance as ExchangesIcon,
   Settings as SettingsIcon,
+  ExpandLess,
+  ExpandMore,
+  ChevronLeft,
+  ChevronRight,
 } from '@mui/icons-material';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -30,11 +34,30 @@ interface SidebarProps {
   drawerWidth: number;
 }
 
-const menuItems = [
-  { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
-  { text: 'Trading Bots', icon: <ShowChartIcon />, path: '/dashboard/bots' },
-  { text: 'Exchanges', icon: <AccountBalanceWalletIcon />, path: '/dashboard/exchanges' },
-  { text: 'Settings', icon: <SettingsIcon />, path: '/dashboard/settings' },
+const navigation = [
+  {
+    name: 'Dashboard',
+    href: '/dashboard',
+    icon: DashboardIcon,
+  },
+  {
+    name: 'Trading Bots',
+    icon: TradingBotsIcon,
+    children: [
+      { name: 'My Bots', href: '/dashboard/bots' },
+      { name: 'My Deals', href: '/dashboard/deals' },
+    ]
+  },
+  {
+    name: 'Exchanges',
+    href: '/dashboard/exchanges',
+    icon: ExchangesIcon,
+  },
+  {
+    name: 'Settings',
+    href: '/dashboard/settings',
+    icon: SettingsIcon,
+  },
 ];
 
 export default function Sidebar({
@@ -46,46 +69,68 @@ export default function Sidebar({
 }: SidebarProps) {
   const theme = useTheme();
   const pathname = usePathname();
+  const [openSubmenu, setOpenSubmenu] = useState(pathname.includes('/dashboard/bots') || pathname.includes('/dashboard/deals'));
 
-  const drawer = (
-    <Box>
+  const drawerContent = (
+    <Box sx={{ overflow: 'auto' }}>
       <Box sx={{ 
         display: 'flex', 
         alignItems: 'center', 
-        justifyContent: isCollapsed ? 'center' : 'flex-end',
-        p: 1,
+        justifyContent: 'flex-end',
+        p: 1
       }}>
         <IconButton onClick={onCollapse}>
-          {isCollapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+          {isCollapsed ? <ChevronRight /> : <ChevronLeft />}
         </IconButton>
       </Box>
-
-      <List component="nav">
-        {menuItems.map((item) => (
-          <ListItem key={item.text} disablePadding>
-            <ListItemButton
-              component={Link}
-              href={item.path}
-              selected={pathname === item.path}
-              sx={{
-                minHeight: 48,
-                justifyContent: isCollapsed ? 'center' : 'initial',
-                px: 2.5,
-                '&.Mui-selected': {
-                  backgroundColor: 'action.selected',
-                },
-              }}
-            >
-              <ListItemIcon sx={{ 
-                minWidth: 0, 
-                mr: isCollapsed ? 0 : 3, 
-                justifyContent: 'center' 
-              }}>
-                {item.icon}
-              </ListItemIcon>
-              {!isCollapsed && <ListItemText primary={item.text} />}
-            </ListItemButton>
-          </ListItem>
+      
+      <List>
+        {navigation.map((item) => (
+          !item.children ? (
+            <ListItem key={item.name} disablePadding>
+              <ListItemButton
+                component={Link}
+                href={item.href}
+                selected={pathname === item.href}
+              >
+                <ListItemIcon>
+                  <item.icon />
+                </ListItemIcon>
+                {!isCollapsed && <ListItemText primary={item.name} />}
+              </ListItemButton>
+            </ListItem>
+          ) : (
+            <Box key={item.name}>
+              <ListItem disablePadding>
+                <ListItemButton onClick={() => setOpenSubmenu(!openSubmenu)}>
+                  <ListItemIcon>
+                    <item.icon />
+                  </ListItemIcon>
+                  {!isCollapsed && (
+                    <>
+                      <ListItemText primary={item.name} />
+                      {openSubmenu ? <ExpandLess /> : <ExpandMore />}
+                    </>
+                  )}
+                </ListItemButton>
+              </ListItem>
+              <Collapse in={openSubmenu && !isCollapsed} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding>
+                  {item.children.map((child) => (
+                    <ListItemButton
+                      key={child.name}
+                      component={Link}
+                      href={child.href}
+                      selected={pathname === child.href}
+                      sx={{ pl: 4 }}
+                    >
+                      <ListItemText primary={child.name} />
+                    </ListItemButton>
+                  ))}
+                </List>
+              </Collapse>
+            </Box>
+          )
         ))}
       </List>
     </Box>
@@ -99,28 +144,37 @@ export default function Sidebar({
         open={mobileOpen}
         onClose={onMobileClose}
         ModalProps={{
-          keepMounted: true,
+          keepMounted: true, // Better mobile performance
         }}
         sx={{
           display: { xs: 'block', sm: 'none' },
-          '& .MuiDrawer-paper': { width: drawerWidth },
-        }}
-      >
-        {drawer}
-      </Drawer>
-
-      {/* Desktop drawer */}
-      <Box
-        sx={{
-          height: '100%',
-          '& .MuiDrawer-paper': {
-            position: 'static',
-            width: 'auto',
+          '& .MuiDrawer-paper': { 
+            width: drawerWidth,
+            boxSizing: 'border-box',
           },
         }}
       >
-        {drawer}
-      </Box>
+        {drawerContent}
+      </Drawer>
+
+      {/* Desktop drawer */}
+      <Drawer
+        variant="permanent"
+        sx={{
+          display: { xs: 'none', sm: 'block' },
+          '& .MuiDrawer-paper': {
+            width: isCollapsed ? 64 : drawerWidth,
+            boxSizing: 'border-box',
+            transition: theme.transitions.create('width', {
+              easing: theme.transitions.easing.sharp,
+              duration: theme.transitions.duration.enteringScreen,
+            }),
+          },
+        }}
+        open
+      >
+        {drawerContent}
+      </Drawer>
     </>
   );
 } 

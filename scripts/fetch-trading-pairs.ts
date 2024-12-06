@@ -1,7 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const ccxt = require('ccxt');
 
-const DEV_MODE = true; // Set this to true to clear the table before importing
+const DEV_MODE = false; // Set this to true to clear the table before importing
 
 const prisma = new PrismaClient();
 
@@ -51,8 +51,11 @@ async function fetchTradingPairs() {
     console.log('Fetching Binance testnet trading pairs...');
     
     if (DEV_MODE) {
-      console.log('DEV MODE: Clearing existing trading pairs...');
-      await prisma.tradingPair.deleteMany({});
+      console.log('DEV MODE: Clearing existing data...');
+      // First delete bots that reference trading pairs
+      await prisma.bot.deleteMany();
+      // Then delete trading pairs
+      await prisma.tradingPair.deleteMany();
     }
 
     const exchange = new ccxt.binance({
@@ -84,7 +87,13 @@ async function fetchTradingPairs() {
         const validMarket = market as CCXTMarket;
         
         // Check if this is a futures pair (contains a colon)
-        const isFuturesPair = validMarket.symbol.includes(':');
+        // Check if this is a futures pair (contains a colon)
+        const isMarginPair = validMarket.symbol.includes(':');
+        
+        // Debug log to check futures pair detection
+        if (isMarginPair) {
+          console.log(`Found margin pair: ${validMarket.symbol}`);
+        }
         
         return {
           exchange: 'binance_testnet',
@@ -95,8 +104,8 @@ async function fetchTradingPairs() {
           maxQuantity: Number(validMarket.limits?.amount?.max ?? 0),
           stepSize: Number(validMarket.precision?.amount ?? 0),
           minNotional: Number(validMarket.limits?.cost?.min ?? 0),
-          isSpot: true,
-          isActive: !isFuturesPair // Set futures pairs to inactive
+          isSpot: true, 
+          isActive: !isMarginPair // Set futures pairs to inactive
         };
       });
 
@@ -107,7 +116,7 @@ async function fetchTradingPairs() {
     }
     console.log(`Found ${pairs.length} trading pairs`);
     console.log(`Active pairs: ${pairs.filter(p => p.isActive).length}`);
-    console.log(`Inactive (futures) pairs: ${pairs.filter(p => !p.isActive).length}`);
+    console.log(`Inactive (margin) pairs: ${pairs.filter(p => !p.isActive).length}`);
 
     // Upsert pairs to database
     let updated = 0;
@@ -126,7 +135,10 @@ async function fetchTradingPairs() {
             maxQuantity: pair.maxQuantity,
             stepSize: pair.stepSize,
             minNotional: pair.minNotional,
-            isActive: true,
+            isActive: pair.isActive,
+            baseAsset: pair.baseAsset,
+            quoteAsset: pair.quoteAsset,
+            updatedAt: new Date(),
           },
           create: pair,
         });
