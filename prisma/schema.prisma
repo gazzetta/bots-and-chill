@@ -98,6 +98,8 @@ model Deal {
   botId           String      
   bot             Bot         @relation(fields: [botId], references: [id])
   status          DealStatus  @default(PENDING)
+  warningMessage  String?     // Add this field for partial setup warnings
+  actualSafetyOrders Int     @default(0)  // Track how many SOs were actually placed
   startedAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
   closedAt        DateTime?   
@@ -186,5 +188,6 @@ enum HistoryType {
   SAFETY_ORDER_TRIGGERED
   TP_UPDATED
   DEAL_CLOSED
+  WARNING           // Add this enum value
   ERROR
 }

@@ -22,6 +22,11 @@ import {
   ExpandMore,
   ChevronLeft,
   ChevronRight,
+  Home as HomeIcon,
+  Memory as CpuChipIcon,
+  BarChart as ChartBarIcon,
+  List as ListIcon,
+  Key as KeyIcon,
 } from '@mui/icons-material';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -52,6 +57,11 @@ const navigation = [
     name: 'Exchanges',
     href: '/dashboard/exchanges',
     icon: ExchangesIcon,
+  },
+  {
+    name: 'Orders',
+    href: '/dashboard/orders',
+    icon: ListIcon,
   },
   {
     name: 'Settings',

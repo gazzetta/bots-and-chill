@@ -1,32 +1,46 @@
+import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
-import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    const session = await auth();
-    const clerkId = session?.userId;
-    
-    if (!clerkId) {
-      return NextResponse.json({ success: false, error: 'Unauthorized' });
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      );
     }
 
-    const user = await prisma.user.findUniqueOrThrow({
-      where: { clerkId },
-      include: {
-        apiKeys: true,
+    const exchanges = await prisma.exchangeKey.findMany({
+      where: {
+        user: {
+          clerkId: userId
+        }
       },
+      select: {
+        id: true,
+        exchange: true,
+        name: true,
+        isTestnet: true,
+        createdAt: true,
+        updatedAt: true
+      }
     });
 
     return NextResponse.json({
       success: true,
-      exchanges: user.apiKeys,
+      data: exchanges
     });
 
   } catch (error) {
-    console.error('Error fetching exchanges:', error);
+    console.error('Failed to fetch exchanges:', error);
+    
     return NextResponse.json(
-      { success: false, error: 'Failed to fetch exchanges' },
+      { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Failed to fetch exchanges'
+      },
       { status: 500 }
     );
   }

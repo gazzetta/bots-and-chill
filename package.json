@@ -20,6 +20,7 @@
     "@mui/x-charts": "^6.19.8",
     "@mui/x-data-grid": "^6.20.4",
     "@prisma/client": "^6.0.1",
+    "axios": "^1.7.9",
     "ccxt": "^4.4.36",
     "date-fns": "^4.1.0",
     "lucide-react": "^0.465.0",

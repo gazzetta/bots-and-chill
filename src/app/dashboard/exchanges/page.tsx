@@ -54,10 +54,13 @@ export default function ExchangesPage() {
       .then(res => res.json())
       .then(data => {
         if (data.success) {
-          setConnectedExchanges(data.exchanges);
+          setConnectedExchanges(data.data || []);
         }
       })
-      .catch(console.error);
+      .catch(error => {
+        console.error('Failed to fetch exchanges:', error);
+        setConnectedExchanges([]);
+      });
   }, [status]);
 
   const handleSubmit = async (e: React.FormEvent) => {

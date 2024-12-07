@@ -13,6 +13,10 @@ import {
   Stack,
   Modal,
   CircularProgress,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -20,6 +24,9 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import StopIcon from '@mui/icons-material/Stop';
 import { DealCreationStatus } from '@/components/DealCreationStatus';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ErrorIcon from '@mui/icons-material/Error';
+import PendingIcon from '@mui/icons-material/Pending';
 
 interface BotDetails {
   id: string;
@@ -41,6 +48,13 @@ interface BotDetails {
   status: string;
 }
 
+// Add new status type
+type OrderStage = {
+  name: string;
+  status: 'pending' | 'processing' | 'success' | 'failed';
+  message?: string;
+};
+
 export default function BotDetailsPage() {
   const [bot, setBot] = useState<BotDetails | null>(null);
   const [loading, setLoading] = useState(true);
@@ -55,7 +69,13 @@ export default function BotDetailsPage() {
     marketPrice?: number;
     desiredPrice?: number;
   }>({ status: 'idle' });
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const params = useParams();
+  const [orderStages, setOrderStages] = useState<OrderStage[]>([
+    { name: 'Base Order', status: 'pending' },
+    { name: 'Take Profit Order', status: 'pending' },
+    { name: 'Safety Orders', status: 'pending' },
+  ]);
 
   useEffect(() => {
     const fetchBotDetails = async () => {
@@ -90,6 +110,7 @@ export default function BotDetailsPage() {
 
   const handlePreviewOrders = async () => {
     setPreviewLoading(true);
+    setErrorMessage(null);
     try {
       const response = await fetch(`/api/bots/${params.id}/preview-orders`);
       const data = await response.json();
@@ -98,10 +119,10 @@ export default function BotDetailsPage() {
         setPreviewData(data);
         setShowPreviewModal(true);
       } else {
-        console.error('Failed to preview orders:', data.error);
+        setErrorMessage(data.error || 'Failed to preview orders');
       }
     } catch (error) {
-      console.error('Failed to preview orders:', error);
+      setErrorMessage('Failed to connect to server');
     } finally {
       setPreviewLoading(false);
     }
@@ -151,80 +172,133 @@ export default function BotDetailsPage() {
         <Typography id="preview-modal-title" variant="h6" component="h2" gutterBottom>
           Preview Orders
         </Typography>
-        {previewData && (
-          <>
-            <Typography variant="subtitle1" gutterBottom>
-              Summary
-            </Typography>
-            <Paper sx={{ p: 2, mb: 2 }}>
-              <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-                {JSON.stringify(previewData.summary, null, 2)}
-              </pre>
-            </Paper>
-            <Typography variant="subtitle1" gutterBottom>
-              Orders
-            </Typography>
-            <Paper sx={{ p: 2 }}>
-              <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-                {JSON.stringify(previewData.orders, null, 2)}
-              </pre>
-            </Paper>
-            <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-              <Button onClick={() => setShowPreviewModal(false)}>
-                Cancel
-              </Button>
-              <Button variant="contained" color="primary">
-                Confirm & Start Bot
-              </Button>
-            </Box>
-          </>
-        )}
+        {renderModalContent()}
       </Box>
     </Modal>
   );
 
+  const renderStageIcon = (status: OrderStage['status']) => {
+    switch (status) {
+      case 'processing':
+        return <CircularProgress size={20} />;
+      case 'success':
+        return <CheckCircleIcon color="success" />;
+      case 'failed':
+        return <ErrorIcon color="error" />;
+      default:
+        return <PendingIcon color="disabled" />;
+    }
+  };
+
+  const updateStage = (stageName: string, status: OrderStage['status'], message?: string) => {
+    setOrderStages(stages => 
+      stages.map(stage => 
+        stage.name === stageName 
+          ? { ...stage, status, message }
+          : stage
+      )
+    );
+  };
+
+  const updateStageFromResponse = (data: any) => {
+    // Base Order
+    if (data.orders.base) {
+      updateStage('Base Order', 'success', `Placed at ${data.orders.base.price} USDT`);
+    } else {
+      updateStage('Base Order', 'failed', 'Failed to place base order');
+    }
+
+    // Take Profit
+    if (data.orders.takeProfit) {
+      updateStage('Take Profit Order', 'success', `Set at ${data.orders.takeProfit.price} USDT`);
+    } else {
+      updateStage('Take Profit Order', 'failed', 'Failed to place take profit order');
+    }
+
+    // Safety Orders
+    if (data.orders.safety) {
+      const placedCount = data.orders.safety.length;
+      const totalCount = bot?.maxSafetyOrders || 0;
+      const status = placedCount === totalCount ? 'success' : 'warning';
+      const message = data.warning || `Placed ${placedCount}/${totalCount} orders`;
+      updateStage('Safety Orders', status, message);
+    } else {
+      updateStage('Safety Orders', 'failed', 'Failed to place safety orders');
+    }
+  };
+
   const startDeal = async () => {
-    setCreationStatus({ status: 'creating' });
+    // Clear previous states
+    setOrderStages(stages => stages.map(stage => ({ ...stage, status: 'pending', message: undefined })));
     
     try {
+      // Update Base Order stage to processing
+      updateStage('Base Order', 'processing', 'Verifying API keys...');
+      
       const response = await fetch(`/api/bots/${params.id}/orders`, {
         method: 'POST'
       });
       
       const data = await response.json();
       
-      if (!response.ok) {
-        setCreationStatus({ 
-          status: 'failed',
-          error: data.error || 'Failed to create deal'
-        });
+      if (response.status === 401) {
+        updateStage('Base Order', 'failed', 'Invalid API keys or insufficient permissions');
         return;
       }
 
-      if (data.attempt > 1) {
-        // Show that we had to retry
-        setCreationStatus({
-          status: 'retrying',
-          attempt: data.attempt,
-          marketPrice: data.currentPrice,
-          desiredPrice: data.desiredPrice
-        });
-        await new Promise(resolve => setTimeout(resolve, 2000)); // Show retry message
+      if (!response.ok) {
+        updateStage('Base Order', 'failed', data.error || 'Failed to create deal');
+        return;
       }
 
-      setCreationStatus({ status: 'success' });
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Show success message
-      
-      // Redirect to deals page
+      updateStageFromResponse(data);
+
+      // Show success for 2 seconds before redirecting
+      await new Promise(resolve => setTimeout(resolve, 2000));
       router.push('/dashboard/deals');
 
     } catch (error) {
-      setCreationStatus({
-        status: 'failed',
-        error: error.message || 'An unexpected error occurred'
-      });
+      updateStage('Base Order', 'failed', 'Network error or server unavailable');
     }
   };
+
+  // Update the modal content
+  const renderModalContent = () => (
+    <Box>
+      {previewData ? (
+        <>
+          <List>
+            {orderStages.map((stage) => (
+              <ListItem key={stage.name}>
+                <ListItemIcon>
+                  {renderStageIcon(stage.status)}
+                </ListItemIcon>
+                <ListItemText 
+                  primary={stage.name}
+                  secondary={stage.message}
+                />
+              </ListItem>
+            ))}
+          </List>
+          <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+            <Button onClick={() => setShowPreviewModal(false)}>
+              Cancel
+            </Button>
+            <Button 
+              variant="contained" 
+              color="primary"
+              onClick={startDeal}
+              disabled={orderStages.some(stage => stage.status === 'processing')}
+            >
+              {orderStages.some(stage => stage.status === 'processing') 
+                ? 'Processing...' 
+                : 'Confirm & Start Bot'}
+            </Button>
+          </Box>
+        </>
+      ) : null}
+    </Box>
+  );
 
   // Show loading state
   if (loading) {

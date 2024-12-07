@@ -11,7 +11,10 @@ import {
   TableRow,
   TableCell,
   Chip,
+  Tooltip,
 } from '@mui/material';
+import WarningIcon from '@mui/icons-material/Warning';
+import InfoIcon from '@mui/icons-material/Info';
 
 export default async function DealsPage() {
   const { userId } = await auth();
@@ -51,6 +54,7 @@ export default async function DealsPage() {
               <TableCell>Bot</TableCell>
               <TableCell>Pair</TableCell>
               <TableCell>Status</TableCell>
+              <TableCell>Safety Orders</TableCell>
               <TableCell align="right">Current Profit</TableCell>
               <TableCell>Started</TableCell>
             </TableRow>
@@ -61,14 +65,26 @@ export default async function DealsPage() {
                 <TableCell>{deal.bot.name}</TableCell>
                 <TableCell>{deal.bot.pair.symbol}</TableCell>
                 <TableCell>
-                  <Chip
-                    label={deal.status}
-                    color={
-                      deal.status === 'ACTIVE' ? 'success' :
-                      deal.status === 'PENDING' ? 'warning' : 'error'
-                    }
-                    size="small"
-                  />
+                  <Tooltip title={deal.warningMessage || ''}>
+                    <Chip
+                      icon={deal.warningMessage ? <WarningIcon /> : undefined}
+                      label={deal.warningMessage ? 'Partial Setup' : deal.status}
+                      color={
+                        deal.warningMessage ? 'warning' :
+                        deal.status === 'ACTIVE' ? 'success' :
+                        deal.status === 'PENDING' ? 'info' : 'error'
+                      }
+                      size="small"
+                    />
+                  </Tooltip>
+                </TableCell>
+                <TableCell>
+                  <Tooltip title={deal.warningMessage ? `${deal.actualSafetyOrders} of ${deal.bot.maxSafetyOrders} placed` : ''}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      {deal.actualSafetyOrders}/{deal.bot.maxSafetyOrders}
+                      {deal.warningMessage && <InfoIcon color="warning" fontSize="small" />}
+                    </Box>
+                  </Tooltip>
                 </TableCell>
                 <TableCell align="right">
                   <Typography
@@ -84,7 +100,7 @@ export default async function DealsPage() {
             ))}
             {deals.length === 0 && (
               <TableRow>
-                <TableCell colSpan={5} align="center">
+                <TableCell colSpan={6} align="center">
                   <Typography color="text.secondary">
                     No active deals found
                   </Typography>

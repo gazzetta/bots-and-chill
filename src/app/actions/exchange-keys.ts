@@ -5,56 +5,68 @@ import { prisma } from '@/lib/prisma';
 import { encrypt } from '@/lib/encryption';
 import { revalidatePath } from 'next/cache';
 
-export async function addExchangeKey(formData: {
+interface ExchangeKeyInput {
   exchange: string;
   apiKey: string;
   apiSecret: string;
-}) {
+}
+
+export async function addExchangeKey(input: ExchangeKeyInput) {
   try {
-    const session = await auth();
-    const clerkId = session?.userId;
-    
-    if (!clerkId) {
-      throw new Error('Unauthorized');
+    const { userId } = await auth();
+    if (!userId) {
+      return {
+        success: false,
+        error: 'Unauthorized'
+      };
     }
 
-    const user = await prisma.user.findUniqueOrThrow({
-      where: { clerkId }
+    // Get user
+    const user = await prisma.user.findUnique({
+      where: { clerkId: userId }
     });
 
-    // Encrypt the API keys
-    const encryptedApiKey = encrypt(formData.apiKey);
-    const encryptedApiSecret = encrypt(formData.apiSecret);
+    if (!user) {
+      return {
+        success: false,
+        error: 'User not found'
+      };
+    }
 
-    await prisma.exchangeKey.upsert({
-      where: {
-        userId_exchange_isTestnet: {
-          userId: user.id,
-          exchange: formData.exchange,
-          isTestnet: formData.exchange.includes('testnet')
-        }
-      },
-      update: {
-        apiKey: encryptedApiKey,
-        apiSecret: encryptedApiSecret,
-      },
-      create: {
+    // Encrypt sensitive data
+    const encryptedApiKey = encrypt(input.apiKey);
+    const encryptedApiSecret = encrypt(input.apiSecret);
+
+    // Create exchange key
+    const exchangeKey = await prisma.exchangeKey.create({
+      data: {
         userId: user.id,
-        exchange: formData.exchange,
-        name: formData.exchange.includes('testnet') ? 'Binance Spot Testnet' : 'Binance Spot',
+        exchange: input.exchange,
+        name: input.exchange === 'binance_testnet' ? 'Binance Testnet' : 'Binance',
         apiKey: encryptedApiKey,
         apiSecret: encryptedApiSecret,
-        isTestnet: formData.exchange.includes('testnet'),
-      },
+        isTestnet: input.exchange === 'binance_testnet'
+      }
     });
 
-    revalidatePath('/dashboard/exchanges');
-    return { success: true };
+    // Always return an object
+    return {
+      success: true,
+      data: {
+        id: exchangeKey.id,
+        exchange: exchangeKey.exchange,
+        name: exchangeKey.name,
+        isTestnet: exchangeKey.isTestnet
+      }
+    };
+
   } catch (error) {
-    console.error('Error saving exchange keys:', error);
-    return { 
-      success: false, 
-      error: 'Failed to save API keys. Please try again.' 
+    console.error('Failed to add exchange key:', error);
+    
+    // Always return an object, even in error case
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to add exchange key'
     };
   }
 } 

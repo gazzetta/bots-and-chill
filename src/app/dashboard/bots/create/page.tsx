@@ -163,26 +163,18 @@ export default function CreateBotPage() {
   const [loadingExchangeKeys, setLoadingExchangeKeys] = useState(true);
 
   useEffect(() => {
-    const fetchExchangeKeys = async () => {
-      try {
-        setLoadingExchangeKeys(true);
-        const response = await fetch('/api/exchanges');
-        const data = await response.json();
+    fetch('/api/exchanges')
+      .then(res => res.json())
+      .then(data => {
         if (data.success) {
-          setExchangeKeys(data.exchanges);
-          // If user has only one exchange key, preselect it
-          if (data.exchanges.length === 1) {
-            setFormData(prev => ({ ...prev, exchangeKey: data.exchanges[0] }));
-          }
+          // Changed from data.exchanges to data.data to match API response
+          setExchangeKeys(data.data || []);
         }
-      } catch (error) {
-        console.error('Failed to fetch exchange keys:', error);
-      } finally {
-        setLoadingExchangeKeys(false);
-      }
-    };
-
-    fetchExchangeKeys();
+      })
+      .catch(error => {
+        console.error('Failed to fetch exchanges:', error);
+        setExchangeKeys([]); // Set empty array on error
+      });
   }, []);
 
   // Modify pairs fetching to include exchange filter
