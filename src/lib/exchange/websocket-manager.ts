@@ -1,6 +1,7 @@
 import { BinanceWebSocket } from './websocket';
 import { prisma } from '@/lib/prisma';
 import { decrypt } from '@/lib/encryption';
+import { ExchangeKey } from '@prisma/client';
 
 class WebSocketManager {
   private static instance: WebSocketManager;
@@ -49,7 +50,7 @@ class WebSocketManager {
   }
 
   // Add new connection when bot starts
-  async addConnection(exchangeKey: any) {
+  async addConnection(exchangeKey: ExchangeKey) {
     const connectionId = `${exchangeKey.exchange}_${exchangeKey.id}`;
     
     if (!this.connections.has(connectionId)) {
@@ -65,12 +66,19 @@ class WebSocketManager {
   }
 
   // Remove connection when last bot stops
-  async removeConnection(exchangeKey: any) {
+  async removeConnection(exchangeKey: ExchangeKey) {
     const connectionId = `${exchangeKey.exchange}_${exchangeKey.id}`;
     const connection = this.connections.get(connectionId);
     
     if (connection) {
       await connection.disconnect();
+      this.connections.delete(connectionId);
+    }
+  }
+
+  async disconnectAll() {
+    for (const [connectionId, ws] of this.connections) {
+      await ws.disconnect();
       this.connections.delete(connectionId);
     }
   }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Box, AppBar, Toolbar, Typography, IconButton } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
@@ -19,6 +19,14 @@ export default function DashboardClient({
   const { toggleColorMode, mode } = useColorMode();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/init').catch(console.error);
+
+    return () => {
+      fetch('/api/websocket/cleanup', { method: 'POST' }).catch(console.error);
+    };
+  }, []);
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>

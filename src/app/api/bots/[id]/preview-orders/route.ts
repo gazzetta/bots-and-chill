@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
 import ccxt from 'ccxt';
+import { createOrders } from '@/lib/orders/createOrders';
 
 export const dynamic = 'force-dynamic';
 
@@ -64,77 +65,27 @@ export async function GET(
         throw new Error(`Could not fetch price for ${bot.pair.symbol}`);
       }
 
-      // Get current price from ticker
-      const currentPrice = ticker.bid;
-      const baseOrderPrice = currentPrice * 0.999; // 0.1% below current bid
-
-      // Convert USDT amounts to BTC
-      const baseOrderAmountInBTC = bot.baseOrderSize / baseOrderPrice; // Convert USDT to BTC
-      let safetyOrderSizeInBTC = bot.safetyOrderSize / baseOrderPrice; // Convert USDT to BTC
-
-      const orders = [];
-
-      // 1. Base Order
-      orders.push({
+      const orders = createOrders({
+        bot,
         symbol: bot.pair.symbol,
-        type: 'limit',
-        side: 'buy',
-        amount: baseOrderAmountInBTC, // Now in BTC
-        price: baseOrderPrice,
-        params: {
-          timeInForce: 'PO',
-          postOnly: true,
-        }
-      });
-
-      // 2. Safety Orders
-      for (let i = 0; i < bot.maxSafetyOrders; i++) {
-        const deviation = bot.priceDeviation * Math.pow(bot.safetyOrderPriceStep, i);
-        const price = baseOrderPrice * (1 - deviation / 100);
-        
-        // Calculate size in USDT first, then convert to BTC
-        const sizeInUSDT = bot.safetyOrderSize * (i === 0 ? 1 : Math.pow(bot.safetyOrderVolumeStep, i));
-        const sizeInBTC = sizeInUSDT / price;
-
-        orders.push({
-          symbol: bot.pair.symbol,
-          type: 'limit',
-          side: 'buy',
-          amount: sizeInBTC, // Now in BTC
-          price: price,
-          params: {
-            timeInForce: 'GTC',
-          }
-        });
-      }
-
-      // 3. Take Profit Order - Initially only for base order amount
-      const takeProfitPrice = baseOrderPrice * (1 + bot.takeProfit / 100);
-
-      orders.push({
-        symbol: bot.pair.symbol,
-        type: 'limit',
-        side: 'sell',
-        amount: baseOrderAmountInBTC, // Only the base order amount initially
-        price: takeProfitPrice,
-        params: {
-          timeInForce: 'GTC',
-        }
+        currentPrice: ticker.bid,
+        isPreview: true
       });
 
       return NextResponse.json({ 
         success: true, 
-        orders,
+        stages: orders,
         summary: {
           name: bot.name,
           pair: bot.pair.symbol,
-          baseOrderPrice,
-          currentMarketPrice: currentPrice,
-          averageEntryPrice: baseOrderPrice, // Initial average is just the base order price
-          takeProfitPrice,
-          totalQuantity: baseOrderAmountInBTC, // Only base order quantity
-          totalCost: baseOrderAmountInBTC * baseOrderPrice, // Only base order cost
-          numberOfOrders: orders.length,
+          estimatedEntryPrice: ticker.bid,
+          currentMarketPrice: ticker.bid,
+          estimatedAverageEntry: ticker.bid,
+          takeProfitPrice: orders.stage2.takeProfit.price,
+          totalQuantity: orders.stage1.amount,
+          totalCost: orders.stage1.amount * ticker.bid,
+          numberOfOrders: 1 + orders.stage2.safetyOrders.length + 1,
+          note: "Base order will be executed at market price. Safety orders and take profit will be adjusted based on actual entry price."
         }
       });
 

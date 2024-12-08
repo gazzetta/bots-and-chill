@@ -55,11 +55,26 @@ type OrderStage = {
   message?: string;
 };
 
+interface PreviewData {
+  orders: any[];
+  summary: {
+    name: string;
+    pair: string;
+    baseOrderPrice: number;
+    currentMarketPrice: number;
+    averageEntryPrice: number;
+    takeProfitPrice: number;
+    totalQuantity: number;
+    totalCost: number;
+    numberOfOrders: number;
+  };
+}
+
 export default function BotDetailsPage() {
   const [bot, setBot] = useState<BotDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [previewData, setPreviewData] = useState(null);
+  const [previewData, setPreviewData] = useState<PreviewData | null>(null);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [previewLoading, setPreviewLoading] = useState(false);
   const [creationStatus, setCreationStatus] = useState<{
@@ -267,6 +282,29 @@ export default function BotDetailsPage() {
     <Box>
       {previewData ? (
         <>
+          <Box sx={{ 
+            mb: 3, 
+            p: 2, 
+            bgcolor: 'background.default',
+            borderRadius: 1,
+            border: 1,
+            borderColor: 'divider'
+          }}>
+            <Typography variant="subtitle2" gutterBottom>
+              Order Details:
+            </Typography>
+            <pre style={{ 
+              overflow: 'auto', 
+              maxHeight: '200px',
+              fontSize: '0.875rem',
+              margin: 0,
+              whiteSpace: 'pre-wrap',
+              wordWrap: 'break-word'
+            }}>
+              {JSON.stringify(previewData, null, 2)}
+            </pre>
+          </Box>
+
           <List>
             {orderStages.map((stage) => (
               <ListItem key={stage.name}>
@@ -280,6 +318,7 @@ export default function BotDetailsPage() {
               </ListItem>
             ))}
           </List>
+
           <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
             <Button onClick={() => setShowPreviewModal(false)}>
               Cancel

@@ -1,61 +1,41 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import {
-  Box,
-  Typography,
-  Paper,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  Chip,
-  CircularProgress,
-  Tabs,
-  Tab
-} from '@mui/material';
-
-interface Order {
-  id: string;
-  symbol: string;
-  type: string;
-  side: 'buy' | 'sell';
-  price: number;
-  amount: number;
-  filled: number;
-  remaining: number;
-  status: string;
-  timestamp: number;
-}
+import { Box, Typography, Paper, CircularProgress, Tabs, Tab } from '@mui/material';
+import { OrdersTable } from './components/OrdersTable';
+import { TradesTable } from './components/TradesTable';
+import { Order, Trade } from './types';
+import { mapCCXTOrder, mapCCXTTrade } from './utils';
 
 export default function OrdersPage() {
-  const [orders, setOrders] = useState<{ open: Order[], closed: Order[] }>({ 
-    open: [], 
-    closed: [] 
-  });
+  const [activeTab, setActiveTab] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [tab, setTab] = useState(0);
+  const [data, setData] = useState({
+    openOrders: [] as Order[],
+    closedOrders: [] as Order[],
+    allOrders: [] as Order[],
+    trades: [] as Trade[],
+    rawResponse: null as Record<string, unknown> | null
+  });
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         setLoading(true);
         const response = await fetch('/api/exchange/orders');
-        const data = await response.json();
-
-        if (data.success) {
-          setOrders({
-            open: data.data?.open || [],
-            closed: data.data?.closed || []
+        const result = await response.json();
+        
+        if (result.success && result.data) {
+          setData({
+            openOrders: (result.data.openOrders || []).map(mapCCXTOrder),
+            closedOrders: (result.data.closedOrders || []).map(mapCCXTOrder),
+            allOrders: (result.data.allOrders || []).map(mapCCXTOrder),
+            trades: (result.data.trades || []).map(mapCCXTTrade),
+            rawResponse: result.data.rawResponse
           });
-        } else {
-          setError(data.error || 'Failed to fetch orders');
         }
       } catch (error) {
-        setError('Failed to fetch orders');
-        console.error('Error fetching orders:', error);
+        console.error('Failed to fetch orders:', error);
       } finally {
         setLoading(false);
       }
@@ -72,86 +52,63 @@ export default function OrdersPage() {
     );
   }
 
-  if (error) {
-    return (
-      <Box sx={{ p: 3 }}>
-        <Typography color="error" gutterBottom>
-          {error}
-        </Typography>
-      </Box>
-    );
-  }
-
-  const renderOrders = (orderList: Order[]) => (
-    <Table>
-      <TableHead>
-        <TableRow>
-          <TableCell>Order ID</TableCell>
-          <TableCell>Type</TableCell>
-          <TableCell>Side</TableCell>
-          <TableCell>Price</TableCell>
-          <TableCell>Amount</TableCell>
-          <TableCell>Filled</TableCell>
-          <TableCell>Status</TableCell>
-          <TableCell>Time</TableCell>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {orderList.map((order) => (
-          <TableRow key={order.id}>
-            <TableCell>{order.id}</TableCell>
-            <TableCell>
-              <Chip 
-                label={order.type.toUpperCase()}
-                color={order.type === 'limit_maker' ? 'secondary' : 'default'}
-                size="small"
-              />
-            </TableCell>
-            <TableCell>
-              <Chip 
-                label={order.side} 
-                color={order.side === 'buy' ? 'success' : 'error'}
-                size="small"
-              />
-            </TableCell>
-            <TableCell>{order.price.toFixed(2)} USDT</TableCell>
-            <TableCell>{order.amount.toFixed(8)} BTC</TableCell>
-            <TableCell>{order.filled}/{order.amount} BTC</TableCell>
-            <TableCell>
-              <Chip 
-                label={order.status}
-                color={
-                  order.status === 'closed' ? 'success' :
-                  order.status === 'canceled' ? 'error' : 'primary'
-                }
-                size="small"
-              />
-            </TableCell>
-            <TableCell>
-              {new Date(order.timestamp).toLocaleString()}
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  );
-
   return (
-    <Box sx={{ p: 3 }}>
-      <Typography variant="h4" gutterBottom>
-        Exchange Orders
-      </Typography>
+    <Box>
+      <Typography variant="h4" gutterBottom>Exchange Orders</Typography>
+      
+      <Tabs value={activeTab} onChange={(_, newValue) => setActiveTab(newValue)}>
+        <Tab label="Open Orders" />
+        <Tab label="Closed Orders" />
+        <Tab label="All Orders" />
+        <Tab label="Trade History" />
+        <Tab label="Raw Response" />
+      </Tabs>
 
-      <Paper sx={{ mb: 2 }}>
-        <Tabs value={tab} onChange={(_, newValue) => setTab(newValue)}>
-          <Tab label={`Open Orders (${orders.open.length})`} />
-          <Tab label={`Closed Orders (${orders.closed.length})`} />
-        </Tabs>
-      </Paper>
+      {/* Open Orders - Currently Empty */}
+      {activeTab === 0 && (
+        <OrdersTable 
+          orders={data.openOrders}
+          title="Currently Active Orders"
+          emptyMessage="No open orders"
+        />
+      )}
 
-      <Paper sx={{ overflow: 'auto' }}>
-        {tab === 0 ? renderOrders(orders.open) : renderOrders(orders.closed)}
-      </Paper>
+      {/* Closed Orders - Shows orders with status 'closed' or 'canceled' */}
+      {activeTab === 1 && (
+        <OrdersTable 
+          orders={data.closedOrders}
+          title="Completed & Cancelled Orders"
+          emptyMessage="No closed orders"
+        />
+      )}
+
+      {/* All Orders - Shows complete order history */}
+      {activeTab === 2 && (
+        <OrdersTable 
+          orders={data.allOrders}
+          title="Complete Order History" 
+          emptyMessage="No orders found"
+        />
+      )}
+
+      {/* Trade History - Shows executed trades */}
+      {activeTab === 3 && (
+        <TradesTable 
+          trades={data.trades}
+          title="Executed Trades"
+          emptyMessage="No trades found"
+        />
+      )}
+
+      {/* Raw Response */}
+      {activeTab === 4 && (
+        <Paper sx={{ p: 2, mt: 2 }}>
+          <Typography variant="h6" gutterBottom>Raw CCXT Responses</Typography>
+          <pre style={{ overflow: 'auto', maxHeight: '500px', whiteSpace: 'pre-wrap' }}>
+            {JSON.stringify(data.rawResponse, null, 2)}
+          </pre>
+        </Paper>
+      )}
     </Box>
   );
 } 

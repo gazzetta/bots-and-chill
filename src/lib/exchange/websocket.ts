@@ -630,4 +630,46 @@ export class BinanceWebSocket {
       });
     }
   }
+
+  async disconnect() {
+    if (this.ws) {
+      this.ws.close();
+      this.ws = null;
+    }
+    if (this.pingInterval) {
+      clearInterval(this.pingInterval);
+      this.pingInterval = null;
+    }
+  }
+
+  private async reconnect() {
+    try {
+      await this.disconnect();
+      await this.connect();
+    } catch (error) {
+      logMessage(LogType.ERROR, 'Failed to reconnect WebSocket', { error });
+    }
+  }
+
+  private setupPing() {
+    // Keep-alive ping every 30 minutes
+    this.pingInterval = setInterval(async () => {
+      try {
+        await axios.put(
+          `${this.baseUrl}/api/v3/userDataStream`,
+          null,
+          {
+            headers: {
+              'X-MBX-APIKEY': this.apiKey
+            },
+            params: {
+              listenKey: this.listenKey
+            }
+          }
+        );
+      } catch (error) {
+        logMessage(LogType.ERROR, 'Failed to ping WebSocket', { error });
+      }
+    }, 30 * 60 * 1000); // 30 minutes
+  }
 }

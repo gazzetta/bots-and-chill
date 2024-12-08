@@ -144,8 +144,16 @@ export async function GET(request: Request) {
     return NextResponse.json({
       success: true,
       data: {
-        open: results.openOrders || [],
-        closed: results.closedOrders || []
+        openOrders: results.openOrders || [],
+        closedOrders: results.closedOrders || [],
+        allOrders: results.allOrders || [],
+        trades: results.myTrades || [],
+        rawResponse: {
+          openOrders: results.openOrders,
+          closedOrders: results.closedOrders,
+          allOrders: results.allOrders,
+          myTrades: results.myTrades
+        }
       }
     });
 
