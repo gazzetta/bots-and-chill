@@ -44,10 +44,10 @@ model TradingPair {
   symbol          String    // e.g., "BTC/USDT"
   baseAsset       String    // e.g., "BTC"
   quoteAsset      String    // e.g., "USDT"
-  minQuantity     Float
-  maxQuantity     Float
-  stepSize        Float
-  minNotional     Float
+  minQuantity     Decimal   @db.Decimal(20,8)
+  maxQuantity     Decimal   @db.Decimal(20,8)
+  stepSize        Decimal   @db.Decimal(20,8)
+  minNotional     Decimal   @db.Decimal(20,8)
   isSpot          Boolean   @default(true)
   isActive        Boolean   @default(true)
   createdAt       DateTime  @default(now())
@@ -72,13 +72,13 @@ model Bot {
   name                  String
   pairId                String
   exchangeKeyId         String
-  baseOrderSize         Float
+  baseOrderSize         Decimal   @db.Decimal(20,8)
   maxSafetyOrders      Int
-  priceDeviation       Float
-  safetyOrderSize      Float
-  safetyOrderPriceStep  Float
-  safetyOrderVolumeStep Float
-  takeProfit            Float
+  priceDeviation       Decimal   @db.Decimal(20,8)
+  safetyOrderSize      Decimal   @db.Decimal(20,8)
+  safetyOrderPriceStep  Decimal   @db.Decimal(20,8)
+  safetyOrderVolumeStep Decimal   @db.Decimal(20,8)
+  takeProfit            Decimal   @db.Decimal(20,8)
   mode                 String   // 'normal' or 'reverse'
   status               String   // 'running', 'stopped', etc.
   createdAt            DateTime @default(now())
@@ -108,10 +108,10 @@ model Deal {
   orders          Order[]     @relation("DealOrders")
   
   // Current Position Info
-  currentQuantity  Float    
-  averagePrice     Float    
-  totalCost        Float    
-  currentProfit    Float    
+  currentQuantity  Decimal   @db.Decimal(20,8)
+  averagePrice     Decimal   @db.Decimal(20,8)
+  totalCost        Decimal   @db.Decimal(20,8)
+  currentProfit    Decimal   @db.Decimal(20,8)
   
   // Deal History
   histories       DealHistory[]
@@ -127,11 +127,11 @@ model Order {
   side            OrderSide   
   status          OrderStatus @default(PENDING)
   symbol          String      
-  quantity        Float       
-  price           Float       
-  filled          Float       
-  remaining       Float       
-  cost            Float       
+  quantity        Decimal   @db.Decimal(20,8)
+  price           Decimal   @db.Decimal(20,8)
+  filled          Decimal   @db.Decimal(20,8)
+  remaining       Decimal   @db.Decimal(20,8)
+  cost            Decimal   @db.Decimal(20,8)
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
   filledAt        DateTime?   

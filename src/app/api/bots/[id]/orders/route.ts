@@ -75,6 +75,7 @@ export async function POST(
         
         const orders = createOrders({
           bot,
+          pair: bot.pair,
           symbol: bot.pair.symbol,
           currentPrice: ticker.bid
         });
@@ -110,6 +111,7 @@ export async function POST(
         // Stage 2: Place Safety Orders and Take Profit using actual fill price
         const stage2Orders = createOrders({
           bot,
+          pair: bot.pair,
           symbol: bot.pair.symbol,
           currentPrice: ticker.bid,
           fillPrice: baseOrder.price

@@ -67,6 +67,7 @@ export async function GET(
 
       const orders = createOrders({
         bot,
+        pair: bot.pair,
         symbol: bot.pair.symbol,
         currentPrice: ticker.bid,
         isPreview: true

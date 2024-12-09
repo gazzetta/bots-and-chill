@@ -2,9 +2,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
 
-export const dynamic = 'force-dynamic';
-
-export async function GET(
+export async function POST(
   request: Request,
   { params }: { params: { id: string } }
 ) {
@@ -14,34 +12,27 @@ export async function GET(
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
-    const botId = params.id;
-    if (!botId) {
+    const { id } = params;
+    if (!id) {
       return NextResponse.json({ success: false, error: 'Bot ID is required' }, { status: 400 });
     }
 
-    const bot = await prisma.bot.findUnique({
-      where: { id: botId },
-      include: {
-        pair: true,
-        exchangeKey: true,
-      },
+    const bot = await prisma.bot.update({
+      where: { id },
+      data: { 
+        status: 'stopped'
+      }
     });
 
-    if (!bot) {
-      return NextResponse.json({ success: false, error: 'Bot not found' }, { status: 404 });
-    }
-
-    console.log('Found bot:', bot);
-
-    return NextResponse.json({
+    return NextResponse.json({ 
       success: true,
-      bot: bot
+      bot
     });
 
   } catch (error) {
-    console.error('Failed to fetch bot:', error);
+    console.error('Failed to stop bot:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to fetch bot details' },
+      { success: false, error: 'Failed to stop bot' },
       { status: 500 }
     );
   }

@@ -17,13 +17,14 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  Snackbar,
+  Alert,
 } from '@mui/material';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import StopIcon from '@mui/icons-material/Stop';
-import { DealCreationStatus } from '@/components/DealCreationStatus';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import PendingIcon from '@mui/icons-material/Pending';
@@ -56,7 +57,20 @@ type OrderStage = {
 };
 
 interface PreviewData {
-  orders: any[];
+  orders: {
+    base?: {
+      price: number;
+      // ... other order properties
+    };
+    takeProfit?: {
+      price: number;
+      // ... other order properties
+    };
+    safety?: Array<{
+      price: number;
+      // ... other order properties
+    }>;
+  };
   summary: {
     name: string;
     pair: string;
@@ -71,26 +85,28 @@ interface PreviewData {
 }
 
 export default function BotDetailsPage() {
+  const params = useParams();
+  const router = useRouter();
   const [bot, setBot] = useState<BotDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [previewData, setPreviewData] = useState<PreviewData | null>(null);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
-  const [previewLoading, setPreviewLoading] = useState(false);
-  const [creationStatus, setCreationStatus] = useState<{
-    status: 'idle' | 'creating' | 'checking' | 'retrying' | 'failed' | 'success';
-    attempt?: number;
-    error?: string;
-    marketPrice?: number;
-    desiredPrice?: number;
-  }>({ status: 'idle' });
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const params = useParams();
   const [orderStages, setOrderStages] = useState<OrderStage[]>([
     { name: 'Base Order', status: 'pending' },
     { name: 'Take Profit Order', status: 'pending' },
     { name: 'Safety Orders', status: 'pending' },
   ]);
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: 'success' | 'error';
+  }>({
+    open: false,
+    message: '',
+    severity: 'success'
+  });
+  const [isRunning, setIsRunning] = useState(false);
 
   useEffect(() => {
     const fetchBotDetails = async () => {
@@ -102,12 +118,11 @@ export default function BotDetailsPage() {
 
       try {
         const response = await fetch(`/api/bots/${params.id}`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch bot details');
-        }
-
         const data = await response.json();
+        console.log('API Response:', data);
+
         if (data.success) {
+          console.log('Setting bot data:', data.bot);
           setBot(data.bot);
         } else {
           setError(data.error || 'Failed to fetch bot details');
@@ -123,9 +138,15 @@ export default function BotDetailsPage() {
     fetchBotDetails();
   }, [params?.id]);
 
+  useEffect(() => {
+    if (bot) {
+      setIsRunning(bot.status === 'active');
+      console.log('Bot status:', bot.status);
+      console.log('Setting isRunning to:', bot.status === 'active');
+    }
+  }, [bot]);
+
   const handlePreviewOrders = async () => {
-    setPreviewLoading(true);
-    setErrorMessage(null);
     try {
       const response = await fetch(`/api/bots/${params.id}/preview-orders`);
       const data = await response.json();
@@ -134,12 +155,40 @@ export default function BotDetailsPage() {
         setPreviewData(data);
         setShowPreviewModal(true);
       } else {
-        setErrorMessage(data.error || 'Failed to preview orders');
+        showMessage(data.error || 'Failed to preview orders', 'error');
       }
     } catch (error) {
-      setErrorMessage('Failed to connect to server');
-    } finally {
-      setPreviewLoading(false);
+      showMessage('Failed to connect to server', 'error');
+    }
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
+
+  const showMessage = (message: string, severity: 'success' | 'error') => {
+    setSnackbar({
+      open: true,
+      message,
+      severity
+    });
+  };
+
+  const handleStopBot = async () => {
+    try {
+      const response = await fetch(`/api/bots/${params.id}/stop`, {
+        method: 'POST',
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to stop bot');
+      }
+
+      setBot(prev => prev ? { ...prev, status: 'stopped' } : null);
+      showMessage('Bot stopped successfully', 'success');
+    } catch (error) {
+      console.error('Failed to stop bot:', error);
+      showMessage('Failed to stop bot', 'error');
     }
   };
 
@@ -150,15 +199,16 @@ export default function BotDetailsPage() {
         color="success"
         startIcon={<PlayArrowIcon />}
         onClick={handlePreviewOrders}
-        disabled={bot?.status === 'active' || previewLoading}
+        disabled={isRunning}
       >
-        {previewLoading ? <CircularProgress size={24} color="inherit" /> : 'Start Bot'}
+        Start Bot
       </Button>
       <Button
         variant="contained"
         color="error"
         startIcon={<StopIcon />}
-        disabled={bot?.status !== 'active'}
+        onClick={handleStopBot}
+        disabled={!isRunning}
       >
         Stop Bot
       </Button>
@@ -215,7 +265,7 @@ export default function BotDetailsPage() {
     );
   };
 
-  const updateStageFromResponse = (data: any) => {
+  const updateStageFromResponse = (data: PreviewData) => {
     // Base Order
     if (data.orders.base) {
       updateStage('Base Order', 'success', `Placed at ${data.orders.base.price} USDT`);
@@ -234,9 +284,11 @@ export default function BotDetailsPage() {
     if (data.orders.safety) {
       const placedCount = data.orders.safety.length;
       const totalCount = bot?.maxSafetyOrders || 0;
-      const status = placedCount === totalCount ? 'success' : 'warning';
-      const message = data.warning || `Placed ${placedCount}/${totalCount} orders`;
-      updateStage('Safety Orders', status, message);
+      updateStage(
+        'Safety Orders', 
+        placedCount === totalCount ? 'success' : 'failed',
+        `Placed ${placedCount}/${totalCount} orders`
+      );
     } else {
       updateStage('Safety Orders', 'failed', 'Failed to place safety orders');
     }
@@ -365,6 +417,12 @@ export default function BotDetailsPage() {
     );
   }
 
+  // Add a helper function to format the status
+  const formatStatus = (status: string | undefined | null) => {
+    if (!status) return ''; // Handle undefined/null case
+    return status.charAt(0).toUpperCase() + status.slice(1);
+  };
+
   return (
     <Box sx={{ p: 3 }}>
       {renderActionButtons()}
@@ -425,7 +483,7 @@ export default function BotDetailsPage() {
             </TableRow>
             <TableRow>
               <TableCell component="th" sx={{ fontWeight: 'bold' }}>Status</TableCell>
-              <TableCell>{bot.status}</TableCell>
+              <TableCell>{formatStatus(bot?.status)}</TableCell>
             </TableRow>
           </TableBody>
         </Table>
@@ -445,9 +503,19 @@ export default function BotDetailsPage() {
         </Button>
       </Stack>
 
-      {creationStatus.status !== 'idle' && (
-        <DealCreationStatus {...creationStatus} />
-      )}
+      <Snackbar 
+        open={snackbar.open} 
+        autoHideDuration={3000} 
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert 
+          onClose={handleCloseSnackbar} 
+          severity={snackbar.severity}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 } 

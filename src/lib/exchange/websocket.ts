@@ -307,7 +307,7 @@ export class BinanceWebSocket {
                      (parseFloat(event.z) * parseFloat(event.L));
     const averagePrice = totalCost / totalQuantity;
 
-    // Update deal
+    // Update deal with new average price
     await tx.deal.update({
       where: { id: order.deal.id },
       data: {
@@ -320,7 +320,7 @@ export class BinanceWebSocket {
       }
     });
 
-    // Cancel current TP using CCXT
+    // Cancel current TP and create new one at new price
     const currentTP = await tx.order.findFirst({
       where: {
         dealId: order.deal.id,
@@ -332,18 +332,13 @@ export class BinanceWebSocket {
     });
 
     if (currentTP) {
-      await this.exchange.cancelOrder(
-        currentTP.exchangeOrderId, 
-        order.deal.bot.pair.symbol
-      );
+      // Cancel old TP
+      await this.exchange.cancelOrder(currentTP.exchangeOrderId, order.deal.bot.pair.symbol);
       
-      await tx.order.update({
-        where: { id: currentTP.id },
-        data: { status: 'CANCELLED' }
-      });
-
-      // Place new TP using CCXT
+      // Calculate new TP price based on new average
       const newTPPrice = calculateTakeProfitPrice(averagePrice, order.deal.bot.takeProfit);
+      
+      // Place new TP order
       const newTPOrder = await this.exchange.createOrder(
         order.deal.bot.pair.symbol,
         'limit',
