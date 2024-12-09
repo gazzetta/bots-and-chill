@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { formatDistance } from 'date-fns';
+import { formatDistance, format } from 'date-fns';
 import {
   Box,
   Typography,
@@ -18,6 +18,7 @@ import {
   List,
   ListItem,
   ListItemText,
+  TableHead,
 } from '@mui/material';
 
 interface DealDetails {
@@ -69,6 +70,10 @@ function calculateEstimatedProfit(deal: DealDetails): string {
   const profit = expectedValue - totalCost;
   
   return isNaN(profit) ? '-' : profit.toFixed(2);
+}
+
+function formatExactTime(date: Date): string {
+  return format(date, "EEE do MMM HH:mm:ss 'UTC'");
 }
 
 function ProfitCalculationModal({ 
@@ -211,40 +216,55 @@ export default function DealDetailsPage() {
       <Paper sx={{ p: 3, mb: 3 }}>
         <Typography variant="h6">Base Order</Typography>
         <Table>
-          <TableBody>
+          <TableHead>
             <TableRow>
               <TableCell>Amount</TableCell>
-              <TableCell>{formatNumber(deal.baseOrder?.amount, 8)}</TableCell>
-            </TableRow>
-            <TableRow>
               <TableCell>Fill Price</TableCell>
-              <TableCell>{formatNumber(deal.baseOrder?.price)}</TableCell>
-            </TableRow>
-            <TableRow>
               <TableCell>Fill Time</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            <TableRow>
               <TableCell>
-                {deal.baseOrder?.filledAt ? 
-                  formatDistance(new Date(deal.baseOrder.filledAt), new Date(), { addSuffix: true }) 
-                  : '-'}
+                {formatNumber(deal.baseOrder?.amount, 8)} {deal.bot.pair.symbol.split('/')[0]}
+              </TableCell>
+              <TableCell>
+                {formatNumber(deal.baseOrder?.price)} {deal.bot.pair.symbol.split('/')[1]}
+              </TableCell>
+              <TableCell>
+                {deal.baseOrder?.filledAt ? (
+                  <Box>
+                    <Typography>
+                      {formatExactTime(new Date(deal.baseOrder.filledAt))}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {formatDistance(new Date(deal.baseOrder.filledAt), new Date(), { addSuffix: true })}
+                    </Typography>
+                  </Box>
+                ) : '-'}
               </TableCell>
             </TableRow>
           </TableBody>
         </Table>
       </Paper>
 
-     
-
       <Paper sx={{ p: 3, mb: 3 }}>
         <Typography variant="h6">Take Profit</Typography>
         <Table>
-          <TableBody>
+          <TableHead>
             <TableRow>
               <TableCell>Target Price</TableCell>
-              <TableCell>{formatNumber(deal.takeProfit?.price)}</TableCell>
-            </TableRow>
-            <TableRow>
               <TableCell>Estimated Profit</TableCell>
-              <TableCell>{calculateEstimatedProfit(deal)} USDT</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            <TableRow>
+              <TableCell>
+                {formatNumber(deal.takeProfit?.price)} {deal.bot.pair.symbol.split('/')[1]}
+              </TableCell>
+              <TableCell>
+                {calculateEstimatedProfit(deal)} {deal.bot.pair.symbol.split('/')[1]}
+              </TableCell>
             </TableRow>
           </TableBody>
         </Table>
@@ -252,36 +272,34 @@ export default function DealDetailsPage() {
 
       <Paper sx={{ p: 3 }}>
         <Typography variant="h6">Safety Orders</Typography>
-        {deal.safetyOrders?.map((so, index) => (
-          <Box key={so.id}>
-            <Typography variant="subtitle1">Safety Order {index + 1}</Typography>
-            <Table>
-              <TableBody>
-                <TableRow>
-                  <TableCell>Amount</TableCell>
-                  <TableCell>{formatNumber(so.amount, 8)}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>Target Price</TableCell>
-                  <TableCell>{formatNumber(so.price)}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>Status</TableCell>
-                  <TableCell>{so.status}</TableCell>
-                </TableRow>
-                {so.filledAt && (
-                  <TableRow>
-                    <TableCell>Filled At</TableCell>
-                    <TableCell>
-                      {formatDistance(new Date(so.filledAt), new Date(), { addSuffix: true })}
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-            {index < deal.safetyOrders.length - 1 && <Divider sx={{ my: 2 }} />}
-          </Box>
-        ))}
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Order Number</TableCell>
+              <TableCell>Amount</TableCell>
+              <TableCell>Target Price</TableCell>
+              <TableCell>Status</TableCell>
+              <TableCell>Fill Time</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {deal.safetyOrders?.map((so, index) => (
+              <TableRow key={so.id}>
+                <TableCell>Safety Order {index + 1}</TableCell>
+                <TableCell>
+                  {formatNumber(so.amount, 8)} {deal.bot.pair.symbol.split('/')[0]}
+                </TableCell>
+                <TableCell>
+                  {formatNumber(so.price)} {deal.bot.pair.symbol.split('/')[1]}
+                </TableCell>
+                <TableCell>{so.status}</TableCell>
+                <TableCell>
+                  {so.filledAt ? formatDistance(new Date(so.filledAt), new Date(), { addSuffix: true }) : '-'}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </Paper>
 
       <ProfitCalculationModal 

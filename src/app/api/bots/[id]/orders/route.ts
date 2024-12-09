@@ -103,7 +103,8 @@ export async function POST(
             filled: Number(baseOrder.amount),
             remaining: 0,
             cost: Number(baseOrder.cost),
-            exchangeOrderId: baseOrder.id
+            exchangeOrderId: baseOrder.id,
+            filledAt: new Date()
           }
         });
         console.log('9. Base order saved to DB');
