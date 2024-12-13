@@ -1,11 +1,20 @@
-import { wsManager } from '@/lib/exchange/websocket-manager';
+import { NextResponse } from 'next/server';
+import { initializeServices } from '@/lib/init';
+import { auth } from '@clerk/nextjs/server';
 
 export async function GET() {
   try {
-    await wsManager.initializeConnections();
-    return new Response('WebSocket connections initialized', { status: 200 });
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
+
+    await initializeServices();
+    return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Failed to initialize WebSocket connections:', error);
-    return new Response('Failed to initialize WebSocket connections', { status: 500 });
+    return NextResponse.json(
+      { success: false, error: String(error) },
+      { status: 500 }
+    );
   }
 } 

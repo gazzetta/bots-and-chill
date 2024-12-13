@@ -7,6 +7,7 @@ import { OrderStatus, DealStatus, OrderType, Deal, Order, Bot, TradingPair, Exch
 import { calculateTakeProfitPrice } from '@/lib/exchange/orders';
 import { logMessage, LogType } from '@/lib/logging';
 import { createOrders } from '@/lib/orders/createOrders';
+import { placeBaseOrder } from '@/lib/orders/placeBaseOrder';
 
 const DEV_MODE = true; // Set to true for debugging
 

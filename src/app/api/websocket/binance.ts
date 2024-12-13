@@ -15,7 +15,7 @@ async function handleTradeUpdate(trade: any) {
     });
 
     // Only create new deal if bot is active
-    if (bot?.status === 'active') {
+    if (bot?.status === 'RUNNING') {
       // Create new deal logic here
     }
   }

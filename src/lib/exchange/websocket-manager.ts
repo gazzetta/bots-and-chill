@@ -2,12 +2,28 @@ import { BinanceWebSocket } from './websocket';
 import { prisma } from '@/lib/prisma';
 import { decrypt } from '@/lib/encryption';
 import { ExchangeKey } from '@prisma/client';
+import { logMessage, LogType } from '@/lib/logging';
+import { EventEmitter } from 'events';
 
 class WebSocketManager {
   private static instance: WebSocketManager;
   private connections: Map<string, BinanceWebSocket> = new Map();
+  private botMappings: Map<string, Set<string>> = new Map();
   
-  private constructor() {}
+  private constructor() {
+    // Increase max listeners to prevent warning
+    EventEmitter.defaultMaxListeners = 20;
+    
+    // Cleanup on process exit
+    process.on('beforeExit', async () => {
+      await this.disconnectAll();
+    });
+    
+    // Cleanup on unhandled errors
+    process.on('uncaughtException', async () => {
+      await this.disconnectAll();
+    });
+  }
   
   static getInstance(): WebSocketManager {
     if (!this.instance) {
@@ -16,9 +32,10 @@ class WebSocketManager {
     return this.instance;
   }
 
-  // Group bots by exchange key to minimize connections
   async initializeConnections() {
-    // Get all active bots
+    // First disconnect all existing connections
+    await this.disconnectAll();
+
     const activeExchangeKeys = await prisma.exchangeKey.findMany({
       where: {
         bots: {
@@ -26,55 +43,52 @@ class WebSocketManager {
             status: 'RUNNING'
           }
         }
-      },
-      include: {
-        bots: true
       }
     });
 
-
-
-    // Create one connection per exchange key
     for (const key of activeExchangeKeys) {
-      const connectionId = `${key.exchange}_${key.id}`;
-      
-      if (!this.connections.has(connectionId)) {
-        const ws = new BinanceWebSocket(
-          decrypt(key.apiKey),
-          decrypt(key.apiSecret),
-          key.isTestnet
-        );
-        
-        await ws.connect();
-        this.connections.set(connectionId, ws);
-      }
+      await this.addConnection(key);
     }
   }
 
-  // Add new connection when bot starts
   async addConnection(exchangeKey: ExchangeKey) {
-    const connectionId = `${exchangeKey.exchange}_${exchangeKey.id}`;
+    const connectionId = `${exchangeKey.exchange}_${exchangeKey.isTestnet}`;
     
+    logMessage(LogType.INFO, 'Adding WebSocket connection', {
+      connectionId,
+      exchange: exchangeKey.exchange,
+      isTestnet: exchangeKey.isTestnet
+    });
+
+    if (!this.botMappings.has(connectionId)) {
+      this.botMappings.set(connectionId, new Set());
+    }
+    this.botMappings.get(connectionId)?.add(exchangeKey.id);
+
     if (!this.connections.has(connectionId)) {
       const ws = new BinanceWebSocket(
-        decrypt(exchangeKey.apiKey),
-        decrypt(exchangeKey.apiSecret),
+        await decrypt(exchangeKey.apiKey),
+        await decrypt(exchangeKey.apiSecret),
         exchangeKey.isTestnet
       );
-      
       await ws.connect();
       this.connections.set(connectionId, ws);
+      logMessage(LogType.INFO, 'New WebSocket connection established', { connectionId });
+    } else {
+      logMessage(LogType.INFO, 'Using existing WebSocket connection', { connectionId });
     }
   }
 
-  // Remove connection when last bot stops
   async removeConnection(exchangeKey: ExchangeKey) {
-    const connectionId = `${exchangeKey.exchange}_${exchangeKey.id}`;
-    const connection = this.connections.get(connectionId);
-    
-    if (connection) {
-      await connection.disconnect();
-      this.connections.delete(connectionId);
+    const connectionId = `${exchangeKey.exchange}_${exchangeKey.isTestnet}`;
+    this.botMappings.get(connectionId)?.delete(exchangeKey.id);
+    if (this.botMappings.get(connectionId)?.size === 0) {
+      const connection = this.connections.get(connectionId);
+      if (connection) {
+        await connection.disconnect();
+        this.connections.delete(connectionId);
+        this.botMappings.delete(connectionId);
+      }
     }
   }
 
@@ -82,7 +96,9 @@ class WebSocketManager {
     for (const [connectionId, ws] of this.connections) {
       await ws.disconnect();
       this.connections.delete(connectionId);
+      this.botMappings.delete(connectionId);
     }
+    logMessage(LogType.INFO, 'All WebSocket connections disconnected');
   }
 }
 

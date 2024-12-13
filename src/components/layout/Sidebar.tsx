@@ -18,6 +18,7 @@ import {
   TrendingUp as TradingBotsIcon,
   AccountBalance as ExchangesIcon,
   Settings as SettingsIcon,
+  DonutLarge as DonutIcon,
   ExpandLess,
   ExpandMore,
   ChevronLeft,
@@ -41,7 +42,7 @@ interface SidebarProps {
 
 const navigation = [
   {
-    name: 'Dashboard',
+    name: 'Dashboardx',
     href: '/dashboard',
     icon: DashboardIcon,
   },
@@ -68,6 +69,11 @@ const navigation = [
     href: '/dashboard/settings',
     icon: SettingsIcon,
   },
+  {
+    name: 'Tests',
+    href: '/dashboard/test',
+    icon: DonutIcon,
+  },  
 ];
 
 export default function Sidebar({

@@ -5,7 +5,8 @@ export enum LogType {
   DEAL_UPDATE = 'DEAL_UPDATE',
   TP_CALCULATION = 'TP_CALCULATION',
   ERROR = 'ERROR',
-  INFO = 'INFO'
+  INFO = 'INFO',
+  WEBSOCKET = 'WEBSOCKET'
 }
 
 interface LogMessage {

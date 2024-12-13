@@ -1,103 +1,83 @@
-import { Decimal } from 'decimal.js';
-import { Bot, TradingPair } from '@prisma/client';
-import { OrderStages } from './types';
-import { toDecimal, formatDecimal } from '@/lib/decimal';
-
-interface CreateOrdersConfig {
-  bot: Bot;
-  pair: TradingPair;
-  symbol: string;
-  currentPrice: number;
-  fillPrice?: number;
-  isPreview?: boolean;
-}
-
-interface OrderConfig {
-  symbol: string;
-  type: 'market' | 'limit';
-  side: 'buy' | 'sell';
-  amount: Decimal;
-  price?: Decimal;
-  params?: any;
-}
-
-export function createOrders({ bot, pair, symbol, currentPrice, fillPrice, isPreview = false }: CreateOrdersConfig): OrderStages {
-  // Helper to round according to pair's minimum quantity
-  const roundToMinQuantity = (amount: Decimal): Decimal => {
-    const precision = Math.log10(1 / Number(pair.minQuantity));
-    return amount.toDecimalPlaces(precision);
+interface OrderStages {
+  stage1: {
+    symbol: string;      // Trading pair (e.g., "BTC/USDT")
+    amount: number;      // Base order quantity
   };
+  stage2: {
+    safetyOrders: Array<{
+      symbol: string;    // Trading pair
+      amount: number;    // SO quantity
+      price: number;     // SO trigger price
+      params: { 
+        timeInForce: string;  // "PO" for Post-Only
+      }
+    }>;
+    takeProfit: {
+      symbol: string;    // Trading pair
+      amount: number;    // TP quantity
+      price: number;     // TP trigger price
+      params: { 
+        timeInForce: string;  // "PO" for Post-Only
+      }
+    }
+  }
+}
 
-  // Stage 1: Base Order (Market)
-  const baseOrderAmount = roundToMinQuantity(
-    toDecimal(bot.baseOrderSize).div(currentPrice)
-  );
-
+export function createOrders({ bot, pair, symbol, currentPrice, fillPrice }: CreateOrdersConfig): OrderStages {
+  // Base order calculations
+  const baseOrderAmount = bot.baseOrderSize / currentPrice;
   const stage1 = {
     symbol,
-    type: 'market',
-    side: 'buy',
     amount: baseOrderAmount
   };
 
-  // Stage 2: Safety Orders + Take Profit
-  const referencePrice = toDecimal(fillPrice || currentPrice);
+  const referencePrice = fillPrice || currentPrice;
   
-  // Safety Orders
+  // Calculate safety orders
   const safetyOrders = [];
-  for (let i = 0; i < bot.maxSafetyOrders; i++) {
-    let deviationPercent;
-    if (i === 0) {
-      deviationPercent = toDecimal(bot.priceDeviation);
-    } else {
-      const previousDeviation = toDecimal(bot.priceDeviation)
-        .mul(toDecimal(bot.safetyOrderPriceStep).pow(i - 1));
-      deviationPercent = previousDeviation.add(
-        previousDeviation.mul(bot.safetyOrderPriceStep)
-      );
-    }
+  let previousPrice = referencePrice;
+  let deviation = bot.priceDeviation;
 
-    const price = i === 0 
-      ? referencePrice.mul(toDecimal(1).minus(deviationPercent.div(100)))
-      : safetyOrders[i-1].price.mul(toDecimal(1).minus(deviationPercent.div(100)));
+  for (let i = 0; i < bot.maxSafetyOrders; i++) {
+    let soPrice;
+    if (i === 0) {
+      soPrice = previousPrice * (1 - deviation / 100);
+    } else {
+      deviation = deviation * bot.safetyOrderPriceStep;
+      soPrice = previousPrice * (1 - deviation / 100);
+    }
     
-    const sizeInUSDT = toDecimal(bot.safetyOrderSize)
-      .mul(i === 0 ? 1 : toDecimal(bot.safetyOrderVolumeStep).pow(i));
-    
-    const sizeInBTC = roundToMinQuantity(sizeInUSDT.div(price));
+    // Volume calculation stays the same
+    let soAmount;
+    if (i === 0) {
+      soAmount = bot.safetyOrderSize / soPrice;
+    } else {
+      soAmount = (bot.safetyOrderSize * Math.pow(bot.safetyOrderVolumeStep, i)) / soPrice;
+    }
 
     safetyOrders.push({
       symbol,
-      type: 'limit',
-      side: 'buy',
-      amount: sizeInBTC,
-      price: price,
-      params: {
-        timeInForce: 'PO'
-      }
+      amount: soAmount,
+      price: soPrice,
+      params: { timeInForce: 'PO' }
     });
+
+    previousPrice = soPrice;  // Use this price as reference for next SO
   }
 
-  // Take Profit
-  const takeProfitPrice = referencePrice
-    .mul(toDecimal(1).plus(toDecimal(bot.takeProfit).div(100)));
-  
-  const takeProfit = {
-    symbol,
-    type: 'limit',
-    side: 'sell',
-    amount: baseOrderAmount,
-    price: takeProfitPrice,
-    params: {
-      timeInForce: 'PO'
-    }
-  };
+  const takeProfitPrice = referencePrice * (1 + bot.takeProfit / 100);
 
   return {
-    stage1: stage1,
+    stage1,
     stage2: {
       safetyOrders,
-      takeProfit
+      takeProfit: {
+        symbol,
+        amount: baseOrderAmount,
+        price: takeProfitPrice,
+        params: { timeInForce: 'PO' }
+      }
     }
   };
-} 
+}
+

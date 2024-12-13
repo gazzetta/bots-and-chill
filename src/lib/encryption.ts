@@ -1,9 +1,11 @@
 import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
 
-// Get encryption key from environment variable
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
-
 if (!ENCRYPTION_KEY || ENCRYPTION_KEY.length !== 64) {
+  console.error('Invalid or missing ENCRYPTION_KEY:', {
+    exists: !!ENCRYPTION_KEY,
+    length: ENCRYPTION_KEY?.length
+  });
   throw new Error('ENCRYPTION_KEY must be a 64-character hex string');
 }
 

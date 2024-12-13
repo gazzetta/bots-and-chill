@@ -94,7 +94,7 @@ export async function GET(request: Request) {
           userId: {
             equals: exchangeKey.userId
           },
-          status: 'active'
+          status: 'RUNNING'
         }
       },
       include: {

@@ -13,8 +13,8 @@ export async function GET(
     if (!userId) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
-
-    const botId = params.id;
+    const { id } = await params;
+    const botId = id;
     if (!botId) {
       return NextResponse.json({ success: false, error: 'Bot ID is required' }, { status: 400 });
     }

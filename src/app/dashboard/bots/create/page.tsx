@@ -131,7 +131,7 @@ const FormFieldWithTooltip = ({
 };
 
 const validateBotName = (name: string) => {
-  const regex = /^[a-zA-Z0-9\s._]+$/;
+  const regex = /^[a-zA-Z0-9\s._/]+$/;
   return regex.test(name);
 };
 
@@ -433,7 +433,7 @@ export default function CreateBotPage() {
               label="Bot Name"
               value={botName}
               error={!!nameError}
-              helperText={nameError || "Only letters, numbers, spaces, dots and underscores allowed"}
+              helperText={nameError || "Only letters, numbers, forward slashes, spaces, dots and underscores allowed"}
               onChange={(e) => {
                 const value = e.target.value;
                 setBotName(value);

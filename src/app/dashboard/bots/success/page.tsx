@@ -16,6 +16,7 @@ import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 
 interface BotDetails {
   id: string;
@@ -166,7 +167,7 @@ export default function BotSuccessPage() {
               <TableCell>{bot.safetyOrderPriceStep}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell component="th" sx={{ fontWeight: 'bold' }}>Volume Scale</TableCell>
+              <TableCell component="th" sx={{ fontWeight: 'bold' }}>Volume Step Scale</TableCell>
               <TableCell>{bot.safetyOrderVolumeStep}</TableCell>
             </TableRow>
             <TableRow>
@@ -198,6 +199,19 @@ export default function BotSuccessPage() {
           Create Similar Bot
         </Button>
       </Stack>
+
+      <Box sx={{ mt: 4 }}>
+        <Button
+          component={Link}
+          href={`/dashboard/bots/${botId}`}
+          variant="contained"
+          color="success"
+          startIcon={<PlayArrowIcon />}
+          size="large"
+        >
+          Start Bot Now
+        </Button>
+      </Box>
     </Box>
   );
 } 

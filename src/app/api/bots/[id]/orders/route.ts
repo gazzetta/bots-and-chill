@@ -5,6 +5,7 @@ import ccxt from 'ccxt';
 import { DealStatus, OrderStatus, OrderType, OrderSide, OrderMethod } from '@prisma/client';
 import { decrypt } from '@/lib/encryption';
 import { createOrders } from '@/lib/orders/createOrders';
+import { placeBaseOrder } from '@/lib/orders/placeBaseOrder';
 
 export async function POST(
   request: Request,
@@ -46,76 +47,21 @@ export async function POST(
         createMarketBuyOrderRequiresPrice: false,
       }
     });
-    exchange.setSandboxMode(true);
+    exchange.setSandboxMode(bot.exchangeKey.isTestnet);
 
     // Start a database transaction
     const deal = await prisma.$transaction(async (tx) => {
       console.log('1. Starting transaction...');
-      const deal = await tx.deal.create({
-        data: {
-          botId: bot.id,
-          status: DealStatus.PENDING,
-          currentQuantity: 0,
-          averagePrice: 0,
-          totalCost: 0,
-          currentProfit: 0,
-          actualSafetyOrders: 0,
-        }
-      });
+      const { deal, baseOrder } = await placeBaseOrder({ bot, exchange, tx });
       console.log('2. Initial deal created in DB:', deal);
 
       try {
-        // Stage 1: Place Base Order
-        console.log('3. Fetching current price from Binance...');
-        const ticker = await exchange.fetchTicker(bot.pair.symbol);
-        if (!ticker || typeof ticker.bid !== 'number') {
-          throw new Error(`Invalid ticker data for ${bot.pair.symbol}: ${JSON.stringify(ticker)}`);
-        }
-        console.log('4. Current price:', ticker.bid);
-        
-        const orders = createOrders({
-          bot,
-          pair: bot.pair,
-          symbol: bot.pair.symbol,
-          currentPrice: ticker.bid
-        });
-
-        console.log('Generated orders:', JSON.stringify(orders, null, 2));
-
-        // Place market order
-        console.log('Placing market order...');
-        const baseOrder = await exchange.createMarketBuyOrder(
-          orders.stage1.symbol,
-          orders.stage1.amount
-        );
-        console.log('Market order response:', JSON.stringify(baseOrder, null, 2));
-
-        // Save base order to DB
-        await tx.order.create({
-          data: {
-            dealId: deal.id,
-            type: OrderType.BASE,
-            side: OrderSide.BUY,
-            method: OrderMethod.MARKET,
-            status: OrderStatus.FILLED,
-            symbol: bot.pair.symbol,
-            quantity: Number(baseOrder.amount),
-            price: Number(baseOrder.price),
-            filled: Number(baseOrder.amount),
-            remaining: 0,
-            cost: Number(baseOrder.cost),
-            exchangeOrderId: baseOrder.id,
-            filledAt: new Date()
-          }
-        });
-        console.log('9. Base order saved to DB');
-
         // Stage 2: Place Safety Orders and Take Profit using actual fill price
         const stage2Orders = createOrders({
           bot,
           pair: bot.pair,
           symbol: bot.pair.symbol,
-          currentPrice: ticker.bid,
+          currentPrice: baseOrder.price,
           fillPrice: baseOrder.price
         }).stage2;
 
@@ -167,17 +113,6 @@ export async function POST(
             remaining: Number(baseOrder.amount),
             cost: 0,
             exchangeOrderId: takeProfitOrder.id
-          }
-        });
-
-        // Update deal status
-        await tx.deal.update({
-          where: { id: deal.id },
-          data: {
-            status: DealStatus.ACTIVE,
-            currentQuantity: baseOrder.amount,
-            averagePrice: baseOrder.price,
-            totalCost: baseOrder.cost
           }
         });
 

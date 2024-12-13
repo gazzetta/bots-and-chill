@@ -142,9 +142,9 @@ export default function BotDetailsPage() {
 
   useEffect(() => {
     if (bot) {
-      setIsRunning(bot.status === 'active');
+      setIsRunning(bot.status === 'RUNNING');
       console.log('Bot status:', bot.status);
-      console.log('Setting isRunning to:', bot.status === 'active');
+      console.log('Setting isRunning to:', bot.status === 'RUNNING');
     }
   }, [bot]);
 
@@ -441,8 +441,8 @@ export default function BotDetailsPage() {
   const formatStatus = (status: string | undefined | null) => {
     if (!status) return '';
     
-    const color = status.toLowerCase() === 'running' ? 'success.main' : 
-                  status.toLowerCase() === 'stopped' ? 'error.main' : 
+    const color = status === 'RUNNING' ? 'success.main' : 
+                  status === 'STOPPED' ? 'error.main' : 
                   'text.primary';
     
     return (
@@ -496,11 +496,11 @@ export default function BotDetailsPage() {
             </TableRow>
             <TableRow>
               <TableCell component="th" sx={{ fontWeight: 'bold' }}>Price Step Scale</TableCell>
-              <TableCell>{Number(bot.safetyOrderPriceStep).toFixed(2)}%</TableCell>
+              <TableCell>{Number(bot.safetyOrderPriceStep).toFixed(2)}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell component="th" sx={{ fontWeight: 'bold' }}>Volume Step Scale</TableCell>
-              <TableCell>{Number(bot.safetyOrderVolumeStep).toFixed(2)}%</TableCell>
+              <TableCell>{Number(bot.safetyOrderVolumeStep).toFixed(2)}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell component="th" sx={{ fontWeight: 'bold' }}>Take Profit</TableCell>

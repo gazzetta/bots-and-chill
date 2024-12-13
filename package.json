@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "migrate:safe": "ts-node scripts/safeMigrate.ts"
+    "migrate:safe": "ts-node scripts/safeMigrate.ts",
+    "dev:log": "next dev 2>&1 | tee dev-output.txt"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.6.0",
@@ -25,6 +26,7 @@
     "ccxt": "^4.4.36",
     "date-fns": "^4.1.0",
     "decimal.js": "^10.4.3",
+    "fs": "^0.0.1-security",
     "lucide-react": "^0.465.0",
     "next": "15.0.3",
     "react": "^18.2.0",
@@ -36,6 +38,7 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/ws": "^8.5.13",
     "eslint": "^8",
     "eslint-config-next": "15.0.3",
     "typescript": "^5"
