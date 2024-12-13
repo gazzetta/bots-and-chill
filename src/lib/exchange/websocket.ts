@@ -2,7 +2,7 @@ import WebSocket from 'ws';
 import { prisma } from '@/lib/prisma';
 import { logMessage, LogType } from '@/lib/logging';
 import axios from 'axios';
-import { OrderType, OrderStatus, DealStatus } from '@prisma/client';
+import { OrderType, OrderStatus, DealStatus, OrderMethod } from '@prisma/client';
 import { PrismaClient } from '@prisma/client';
 import { calculateTakeProfitPrice } from '@/lib/exchange/orders';
 import ccxt from 'ccxt';
@@ -360,7 +360,8 @@ export class BinanceWebSocket {
           price: newTPPrice,
           filled: 0,
           remaining: totalQuantity,
-          exchangeOrderId: newTPOrder.id
+          exchangeOrderId: newTPOrder.id,
+          method: OrderMethod.LIMIT
         }
       });
     }
@@ -473,7 +474,8 @@ export class BinanceWebSocket {
             price: baseOrderPrice,
             filled: 0,
             remaining: baseOrderAmount,
-            exchangeOrderId: baseOrder.id
+            exchangeOrderId: baseOrder.id,
+            method: OrderMethod.MARKET
           }
         });
 

@@ -90,6 +90,10 @@ export function DealsTable({ deals }: { deals: Deal[] }) {
           label={params.value}
           color={params.value === 'ACTIVE' ? 'success' : 'default'}
           size="small"
+          // sx is MUI's styling prop that accepts CSS-in-JS object
+          // It's similar to the style prop but with added features specific to MUI
+          // Here we use it to set the text color to white
+          sx={{ color: 'white' }}
         />
       )
     },

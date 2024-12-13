@@ -23,7 +23,7 @@ class WebSocketManager {
       where: {
         bots: {
           some: {
-            status: 'ACTIVE'
+            status: 'RUNNING'
           }
         }
       },
@@ -31,6 +31,8 @@ class WebSocketManager {
         bots: true
       }
     });
+
+
 
     // Create one connection per exchange key
     for (const key of activeExchangeKeys) {

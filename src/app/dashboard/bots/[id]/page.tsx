@@ -84,6 +84,12 @@ interface PreviewData {
   };
 }
 
+interface SnackbarState {
+  open: boolean;
+  message: string | React.ReactNode;
+  severity: 'success' | 'error';
+}
+
 export default function BotDetailsPage() {
   const params = useParams();
   const router = useRouter();
@@ -97,11 +103,7 @@ export default function BotDetailsPage() {
     { name: 'Take Profit Order', status: 'pending' },
     { name: 'Safety Orders', status: 'pending' },
   ]);
-  const [snackbar, setSnackbar] = useState<{
-    open: boolean;
-    message: string;
-    severity: 'success' | 'error';
-  }>({
+  const [snackbar, setSnackbar] = useState<SnackbarState>({
     open: false,
     message: '',
     severity: 'success'
@@ -148,6 +150,30 @@ export default function BotDetailsPage() {
 
   const handlePreviewOrders = async () => {
     try {
+      // First check for existing running bots
+      const checkResponse = await fetch(`/api/bots/check-running`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          exchange: bot?.exchangeKey.name,
+          pair: bot?.pair.symbol,
+          botId: bot?.id // exclude current bot from check
+        })
+      });
+      
+      const checkData = await checkResponse.json();
+      
+      if (checkData.hasRunningBot) {
+        showMessage(
+          `You already have a bot running on ${bot?.exchangeKey.name} with the pair ${bot?.pair.symbol}. Only one bot can run on a single pair on each exchange.`,
+          'error'
+        );
+        return;
+      }
+
+      // If no running bots, proceed with preview
       const response = await fetch(`/api/bots/${params.id}/preview-orders`);
       const data = await response.json();
       
@@ -184,8 +210,8 @@ export default function BotDetailsPage() {
         throw new Error('Failed to stop bot');
       }
 
-      setBot(prev => prev ? { ...prev, status: 'stopped' } : null);
-      showMessage('Bot stopped successfully', 'success');
+      setBot(prev => prev ? { ...prev, status: 'STOPPED' } : null);
+      showMessage('Bot STOPPED successfully', 'success');
     } catch (error) {
       console.error('Failed to stop bot:', error);
       showMessage('Failed to stop bot', 'error');
@@ -265,32 +291,18 @@ export default function BotDetailsPage() {
     );
   };
 
-  const updateStageFromResponse = (data: PreviewData) => {
+  const updateStageFromResponse = (data: any) => {
+    console.log('Updating stages with data:', data);
+
     // Base Order
-    if (data.orders.base) {
-      updateStage('Base Order', 'success', `Placed at ${data.orders.base.price} USDT`);
+    if (data.success && data.stages?.stage1) {
+      updateStage('Base Order', 'success', 'Market order placed');
+      updateStage('Take Profit Order', 'success', 'Take profit order placed');
+      updateStage('Safety Orders', 'success', `${bot?.maxSafetyOrders} orders placed`);
     } else {
-      updateStage('Base Order', 'failed', 'Failed to place base order');
-    }
-
-    // Take Profit
-    if (data.orders.takeProfit) {
-      updateStage('Take Profit Order', 'success', `Set at ${data.orders.takeProfit.price} USDT`);
-    } else {
-      updateStage('Take Profit Order', 'failed', 'Failed to place take profit order');
-    }
-
-    // Safety Orders
-    if (data.orders.safety) {
-      const placedCount = data.orders.safety.length;
-      const totalCount = bot?.maxSafetyOrders || 0;
-      updateStage(
-        'Safety Orders', 
-        placedCount === totalCount ? 'success' : 'failed',
-        `Placed ${placedCount}/${totalCount} orders`
-      );
-    } else {
-      updateStage('Safety Orders', 'failed', 'Failed to place safety orders');
+      updateStage('Base Order', 'failed', data.error || 'Failed to create orders');
+      updateStage('Take Profit Order', 'failed');
+      updateStage('Safety Orders', 'failed');
     }
   };
 
@@ -299,7 +311,6 @@ export default function BotDetailsPage() {
     setOrderStages(stages => stages.map(stage => ({ ...stage, status: 'pending', message: undefined })));
     
     try {
-      // Update Base Order stage to processing
       updateStage('Base Order', 'processing', 'Verifying API keys...');
       
       const response = await fetch(`/api/bots/${params.id}/orders`, {
@@ -307,12 +318,8 @@ export default function BotDetailsPage() {
       });
       
       const data = await response.json();
+      console.log('Order creation response:', data);
       
-      if (response.status === 401) {
-        updateStage('Base Order', 'failed', 'Invalid API keys or insufficient permissions');
-        return;
-      }
-
       if (!response.ok) {
         updateStage('Base Order', 'failed', data.error || 'Failed to create deal');
         return;
@@ -320,12 +327,25 @@ export default function BotDetailsPage() {
 
       updateStageFromResponse(data);
 
-      // Show success for 2 seconds before redirecting
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      router.push('/dashboard/deals');
+      // Show success message with link
+      setSnackbar({
+        open: true,
+        severity: 'success',
+        message: (
+          <Box>
+            Bot started successfully!{' '}
+            <Link href="/dashboard/deals" style={{ color: 'inherit', textDecoration: 'underline' }}>
+              View Deals
+            </Link>
+          </Box>
+        )
+      });
 
     } catch (error) {
-      updateStage('Base Order', 'failed', 'Network error or server unavailable');
+      console.error('Start deal error:', error);
+      updateStage('Base Order', 'failed', 
+        error instanceof Error ? error.message : 'Network error or server unavailable'
+      );
     }
   };
 
@@ -419,8 +439,17 @@ export default function BotDetailsPage() {
 
   // Add a helper function to format the status
   const formatStatus = (status: string | undefined | null) => {
-    if (!status) return ''; // Handle undefined/null case
-    return status.charAt(0).toUpperCase() + status.slice(1);
+    if (!status) return '';
+    
+    const color = status.toLowerCase() === 'running' ? 'success.main' : 
+                  status.toLowerCase() === 'stopped' ? 'error.main' : 
+                  'text.primary';
+    
+    return (
+      <Typography component="span" sx={{ color }}>
+        {status}
+      </Typography>
+    );
   };
 
   return (
@@ -467,11 +496,11 @@ export default function BotDetailsPage() {
             </TableRow>
             <TableRow>
               <TableCell component="th" sx={{ fontWeight: 'bold' }}>Price Step Scale</TableCell>
-              <TableCell>{bot.safetyOrderPriceStep}</TableCell>
+              <TableCell>{Number(bot.safetyOrderPriceStep).toFixed(2)}%</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell component="th" sx={{ fontWeight: 'bold' }}>Volume Scale</TableCell>
-              <TableCell>{bot.safetyOrderVolumeStep}</TableCell>
+              <TableCell component="th" sx={{ fontWeight: 'bold' }}>Volume Step Scale</TableCell>
+              <TableCell>{Number(bot.safetyOrderVolumeStep).toFixed(2)}%</TableCell>
             </TableRow>
             <TableRow>
               <TableCell component="th" sx={{ fontWeight: 'bold' }}>Take Profit</TableCell>
@@ -505,13 +534,28 @@ export default function BotDetailsPage() {
 
       <Snackbar 
         open={snackbar.open} 
-        autoHideDuration={3000} 
+        
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
         <Alert 
           onClose={handleCloseSnackbar} 
           severity={snackbar.severity}
+          sx={{ 
+            width: '100%',
+            color: 'white',
+            ...(snackbar.severity === 'error' ? {
+              bgcolor: 'error.main',
+              '& .MuiAlert-icon': {
+                color: 'white'
+              }
+            } : {
+              bgcolor: 'success.main',
+              '& .MuiAlert-icon': {
+                color: 'white'
+              }
+            })
+          }}
         >
           {snackbar.message}
         </Alert>

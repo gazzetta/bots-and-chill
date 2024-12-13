@@ -20,7 +20,7 @@ export async function POST(
     const bot = await prisma.bot.update({
       where: { id },
       data: { 
-        status: 'stopped'
+        status: 'STOPPED'
       }
     });
 

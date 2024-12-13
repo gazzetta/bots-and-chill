@@ -36,7 +36,7 @@ export async function POST(request: Request) {
         safetyOrderVolumeStep: data.safetyOrderVolumeStep,
         takeProfit: data.takeProfit,
         mode: data.mode,
-        status: 'stopped',
+        status: 'STOPPED',
       },
       include: {
         pair: true,

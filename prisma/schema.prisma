@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,79 +8,78 @@ datasource db {
 }
 
 model User {
-  id          String       @id @default(uuid())
-  clerkId     String       @unique
-  email       String       @unique
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  apiKeys     ExchangeKey[]
+  id        String        @id @default(uuid())
+  clerkId   String        @unique
+  email     String        @unique
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  apiKeys   ExchangeKey[]
 }
 
 model ExchangeKey {
-  id          String    @id @default(uuid())
-  userId      String
-  exchange    String    // e.g., "binance", "bybit"
-  name        String    // e.g., "Binance Spot Testnet"
-  apiKey      String
-  apiSecret   String
-  isTestnet   Boolean   @default(false)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  user        User      @relation(fields: [userId], references: [id])
-  bots        Bot[]
+  id        String   @id @default(uuid())
+  userId    String
+  exchange  String
+  name      String
+  apiKey    String
+  apiSecret String
+  isTestnet Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  bots      Bot[]
+  user      User     @relation(fields: [userId], references: [id])
 
   @@unique([userId, exchange, isTestnet])
 }
 
 model TradingPair {
-  id              String    @id @default(uuid())
-  exchange        String    // e.g., "binance", "bybit"
-  symbol          String    // e.g., "BTC/USDT"
-  baseAsset       String    // e.g., "BTC"
-  quoteAsset      String    // e.g., "USDT"
-  minQuantity     Decimal   @db.Decimal(20,8)
-  maxQuantity     Decimal   @db.Decimal(20,8)
-  stepSize        Decimal   @db.Decimal(20,8)
-  minNotional     Decimal   @db.Decimal(20,8)
-  isSpot          Boolean   @default(true)
-  isActive        Boolean   @default(true)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  bots            Bot[]
+  id          String   @id @default(uuid())
+  exchange    String
+  symbol      String
+  baseAsset   String
+  quoteAsset  String
+  minQuantity Decimal  @db.Decimal(20, 8)
+  maxQuantity Decimal  @db.Decimal(20, 8)
+  stepSize    Decimal  @db.Decimal(20, 8)
+  minNotional Decimal  @db.Decimal(20, 8)
+  isSpot      Boolean  @default(true)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  bots        Bot[]
 
   @@unique([exchange, symbol, isSpot])
 }
 
 model SystemConfig {
-  id              String    @id @default(uuid())
-  key             String    @unique
-  value           String
-  updatedAt       DateTime  @updatedAt
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
 
   @@index([key])
 }
 
 model Bot {
-  id                    String   @id @default(cuid())
+  id                    String      @id @default(cuid())
   userId                String
-  name                  String
   pairId                String
+  baseOrderSize         Decimal     @db.Decimal(20, 8)
+  maxSafetyOrders       Int
+  priceDeviation        Decimal     @db.Decimal(20, 8)
+  safetyOrderSize       Decimal     @db.Decimal(20, 8)
+  safetyOrderPriceStep  Decimal     @db.Decimal(20, 8)
+  safetyOrderVolumeStep Decimal     @db.Decimal(20, 8)
+  takeProfit            Decimal     @db.Decimal(20, 8)
+  mode                  String
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+  name                  String
   exchangeKeyId         String
-  baseOrderSize         Decimal   @db.Decimal(20,8)
-  maxSafetyOrders      Int
-  priceDeviation       Decimal   @db.Decimal(20,8)
-  safetyOrderSize      Decimal   @db.Decimal(20,8)
-  safetyOrderPriceStep  Decimal   @db.Decimal(20,8)
-  safetyOrderVolumeStep Decimal   @db.Decimal(20,8)
-  takeProfit            Decimal   @db.Decimal(20,8)
-  mode                 String   // 'normal' or 'reverse'
-  status               String   // 'running', 'stopped', etc.
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
+  status                BotStatus   @default(STOPPED)
+  exchangeKey           ExchangeKey @relation(fields: [exchangeKeyId], references: [id])
+  pair                  TradingPair @relation(fields: [pairId], references: [id])
   deals                 Deal[]
-
-  pair        TradingPair @relation(fields: [pairId], references: [id])
-  exchangeKey ExchangeKey @relation(fields: [exchangeKeyId], references: [id])
 
   @@index([userId])
   @@index([pairId])
@@ -94,27 +87,21 @@ model Bot {
 }
 
 model Deal {
-  id              String      @id @default(cuid())
-  botId           String      
-  bot             Bot         @relation(fields: [botId], references: [id])
-  status          DealStatus  @default(PENDING)
-  warningMessage  String?     // Add this field for partial setup warnings
-  actualSafetyOrders Int     @default(0)  // Track how many SOs were actually placed
-  startedAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
-  closedAt        DateTime?   
-
-  // All orders in this deal
-  orders          Order[]     @relation("DealOrders")
-  
-  // Current Position Info
-  currentQuantity  Decimal   @db.Decimal(20,8)
-  averagePrice     Decimal   @db.Decimal(20,8)
-  totalCost        Decimal   @db.Decimal(20,8)
-  currentProfit    Decimal   @db.Decimal(20,8)
-  
-  // Deal History
-  histories       DealHistory[]
+  id                 String        @id @default(cuid())
+  botId              String
+  status             DealStatus    @default(PENDING)
+  startedAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  closedAt           DateTime?
+  currentQuantity    Decimal       @db.Decimal(20, 8)
+  averagePrice       Decimal       @db.Decimal(20, 8)
+  totalCost          Decimal       @db.Decimal(20, 8)
+  currentProfit      Decimal       @db.Decimal(20, 8)
+  actualSafetyOrders Int           @default(0)
+  warningMessage     String?
+  bot                Bot           @relation(fields: [botId], references: [id])
+  histories          DealHistory[]
+  orders             Order[]       @relation("DealOrders")
 
   @@index([botId])
 }
@@ -122,43 +109,50 @@ model Deal {
 model Order {
   id              String      @id @default(uuid())
   dealId          String
-  deal            Deal        @relation("DealOrders", fields: [dealId], references: [id])
-  type            OrderType   
-  side            OrderSide   
+  type            OrderType
+  side            OrderSide
+  method          OrderMethod @default(LIMIT)
   status          OrderStatus @default(PENDING)
-  symbol          String      
-  quantity        Decimal   @db.Decimal(20,8)
-  price           Decimal   @db.Decimal(20,8)
-  filled          Decimal   @db.Decimal(20,8)
-  remaining       Decimal   @db.Decimal(20,8)
-  cost            Decimal   @db.Decimal(20,8)
+  symbol          String
+  quantity        Decimal     @db.Decimal(20, 8)
+  price           Decimal     @db.Decimal(20, 8)
+  filled          Decimal     @db.Decimal(20, 8)
+  remaining       Decimal     @db.Decimal(20, 8)
+  cost            Decimal     @db.Decimal(20, 8)
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
-  filledAt        DateTime?   
-  exchangeOrderId  String    
+  filledAt        DateTime?
+  exchangeOrderId String
+  deal            Deal        @relation("DealOrders", fields: [dealId], references: [id])
 
   @@index([dealId])
 }
 
 model DealHistory {
-  id          String      @id @default(cuid())
-  dealId      String
-  deal        Deal        @relation(fields: [dealId], references: [id])
-  type        HistoryType
-  orderId     String?     
-  oldValue    Json?       
-  newValue    Json        
-  timestamp   DateTime    @default(now())
+  id        String      @id @default(cuid())
+  dealId    String
+  type      HistoryType
+  orderId   String?
+  oldValue  Json?
+  newValue  Json
+  timestamp DateTime    @default(now())
+  deal      Deal        @relation(fields: [dealId], references: [id])
 
   @@index([dealId])
 }
 
+enum BotStatus {
+  RUNNING
+  STOPPED
+  ERROR
+}
+
 enum DealStatus {
-  PENDING     // Just created, waiting for orders to be placed
-  ACTIVE      // Base order placed successfully
-  COMPLETED   // Take profit hit or manually closed
-  FAILED      // Error occurred during setup
-  CANCELLED   // Manually cancelled before completion
+  PENDING
+  ACTIVE
+  COMPLETED
+  FAILED
+  CANCELLED
 }
 
 enum OrderType {
@@ -168,8 +162,8 @@ enum OrderType {
 }
 
 enum OrderStatus {
-  PENDING     // Just created
-  PLACED      // Successfully placed on exchange
+  PENDING
+  PLACED
   PARTIALLY_FILLED
   FILLED
   CANCELLED
@@ -188,6 +182,11 @@ enum HistoryType {
   SAFETY_ORDER_TRIGGERED
   TP_UPDATED
   DEAL_CLOSED
-  WARNING           // Add this enum value
   ERROR
+  WARNING
+}
+
+enum OrderMethod {
+  MARKET
+  LIMIT
 }

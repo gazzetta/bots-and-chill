@@ -7,13 +7,15 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+
+    const { id } = await params;
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
     const deal = await prisma.deal.findUnique({
-      where: { id: params.id },
+      where: { id: id },
       include: {
         bot: {
           include: {

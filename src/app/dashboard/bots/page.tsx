@@ -18,7 +18,7 @@ import AddIcon from '@mui/icons-material/Add';
 interface Bot {
   id: string;
   name: string;
-  status: 'running' | 'stopped';
+  status: 'RUNNING' | 'STOPPED';
   pair: {
     symbol: string;
   };
@@ -90,7 +90,7 @@ export default function BotsPage() {
                 <TableCell>{bot.takeProfit}%</TableCell>
                 <TableCell>{bot.mode}</TableCell>
                 <TableCell>{new Date(bot.createdAt).toLocaleDateString()}</TableCell>
-                <TableCell>{bot.status}</TableCell>
+                <TableCell>{bot.status === "RUNNING" ? <Typography color="green" fontWeight="bold">RUNNING</Typography> : <Typography color="red" fontWeight="bold">STOPPED</Typography>}</TableCell>
                 <TableCell>
                   <Button
                     size="small"

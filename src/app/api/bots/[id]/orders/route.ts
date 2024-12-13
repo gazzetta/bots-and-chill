@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
 import ccxt from 'ccxt';
-import { DealStatus, OrderStatus, OrderType, OrderSide } from '@prisma/client';
+import { DealStatus, OrderStatus, OrderType, OrderSide, OrderMethod } from '@prisma/client';
 import { decrypt } from '@/lib/encryption';
 import { createOrders } from '@/lib/orders/createOrders';
 
@@ -96,6 +96,7 @@ export async function POST(
             dealId: deal.id,
             type: OrderType.BASE,
             side: OrderSide.BUY,
+            method: OrderMethod.MARKET,
             status: OrderStatus.FILLED,
             symbol: bot.pair.symbol,
             quantity: Number(baseOrder.amount),
@@ -131,6 +132,7 @@ export async function POST(
               dealId: deal.id,
               type: OrderType.SAFETY,
               side: OrderSide.BUY,
+              method: OrderMethod.LIMIT,
               status: OrderStatus.PLACED,
               symbol: bot.pair.symbol,
               quantity: Number(so.amount),
@@ -156,6 +158,7 @@ export async function POST(
             dealId: deal.id,
             type: OrderType.TAKE_PROFIT,
             side: OrderSide.SELL,
+            method: OrderMethod.LIMIT,
             status: OrderStatus.PLACED,
             symbol: bot.pair.symbol,
             quantity: Number(baseOrder.amount),
@@ -179,10 +182,10 @@ export async function POST(
         });
 
         console.log('21. Updating bot status if needed...');
-        if (bot.status === 'stopped') {
+        if (bot.status === 'STOPPED') {
           await tx.bot.update({
             where: { id: bot.id },
-            data: { status: 'active' }
+            data: { status: 'RUNNING' }
           });
         }
 
