@@ -16,19 +16,19 @@ interface OrdersTableProps {
 type OrderKey = keyof Order;
 
 export function OrdersTable({ orders, title, emptyMessage }: OrdersTableProps) {
-  const [orderBy, setOrderBy] = useState<OrderKey>('timestamp');
-  const [order, setOrder] = useState<'asc' | 'desc'>('desc');
+  const [viewsorBY, setviewsorBY] = useState<OrderKey>('timestamp');
+  const [viewsortChoice, setOrder] = useState<'asc' | 'desc'>('desc');
 
   const handleSort = (property: OrderKey) => {
-    const isAsc = orderBy === property && order === 'asc';
+    const isAsc = viewsorBY === property && viewsortChoice === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
+    setviewsorBY(property);
   };
 
   const sortedOrders = [...orders].sort((a, b) => {
-    if (!a[orderBy] || !b[orderBy]) return 0;
-    const comparison = String(a[orderBy]).localeCompare(String(b[orderBy]));
-    return order === 'desc' ? -comparison : comparison;
+    if (!a[viewsorBY] || !b[viewsorBY]) return 0;
+    const comparison = String(a[viewsorBY]).localeCompare(String(b[viewsorBY]));
+    return viewsortChoice === 'desc' ? -comparison : comparison;
   });
 
   const formatDate = (timestamp: number) => {
@@ -45,8 +45,8 @@ export function OrdersTable({ orders, title, emptyMessage }: OrdersTableProps) {
               <TableCell width={50}>#</TableCell>
               <TableCell>
                 <TableSortLabel
-                  active={orderBy === 'timestamp'}
-                  direction={orderBy === 'timestamp' ? order : 'asc'}
+                  active={viewsorBY === 'timestamp'}
+                  direction={viewsorBY === 'timestamp' ? viewsortChoice : 'asc'}
                   onClick={() => handleSort('timestamp')}
                 >
                   Time
@@ -54,8 +54,8 @@ export function OrdersTable({ orders, title, emptyMessage }: OrdersTableProps) {
               </TableCell>
               <TableCell>
                 <TableSortLabel
-                  active={orderBy === 'id'}
-                  direction={orderBy === 'id' ? order : 'asc'}
+                  active={viewsorBY === 'id'}
+                  direction={viewsorBY === 'id' ? viewsortChoice : 'asc'}
                   onClick={() => handleSort('id')}
                 >
                   Order ID
@@ -63,8 +63,8 @@ export function OrdersTable({ orders, title, emptyMessage }: OrdersTableProps) {
               </TableCell>
               <TableCell>
                 <TableSortLabel
-                  active={orderBy === 'symbol'}
-                  direction={orderBy === 'symbol' ? order : 'asc'}
+                  active={viewsorBY === 'symbol'}
+                  direction={viewsorBY === 'symbol' ? viewsortChoice : 'asc'}
                   onClick={() => handleSort('symbol')}
                 >
                   Pair
@@ -72,8 +72,8 @@ export function OrdersTable({ orders, title, emptyMessage }: OrdersTableProps) {
               </TableCell>
               <TableCell>
                 <TableSortLabel
-                  active={orderBy === 'type'}
-                  direction={orderBy === 'type' ? order : 'asc'}
+                  active={viewsorBY === 'type'}
+                  direction={viewsorBY === 'type' ? viewsortChoice : 'asc'}
                   onClick={() => handleSort('type')}
                 >
                   Type
@@ -81,8 +81,8 @@ export function OrdersTable({ orders, title, emptyMessage }: OrdersTableProps) {
               </TableCell>
               <TableCell>
                 <TableSortLabel
-                  active={orderBy === 'side'}
-                  direction={orderBy === 'side' ? order : 'asc'}
+                  active={viewsorBY === 'side'}
+                  direction={viewsorBY === 'side' ? viewsortChoice : 'asc'}
                   onClick={() => handleSort('side')}
                 >
                   Side
@@ -90,8 +90,8 @@ export function OrdersTable({ orders, title, emptyMessage }: OrdersTableProps) {
               </TableCell>
               <TableCell>
                 <TableSortLabel
-                  active={orderBy === 'price'}
-                  direction={orderBy === 'price' ? order : 'asc'}
+                  active={viewsorBY === 'price'}
+                  direction={viewsorBY === 'price' ? viewsortChoice : 'asc'}
                   onClick={() => handleSort('price')}
                 >
                   Price
@@ -102,8 +102,8 @@ export function OrdersTable({ orders, title, emptyMessage }: OrdersTableProps) {
               <TableCell>Cost</TableCell>
               <TableCell>
                 <TableSortLabel
-                  active={orderBy === 'status'}
-                  direction={orderBy === 'status' ? order : 'asc'}
+                  active={viewsorBY === 'status'}
+                  direction={viewsorBY === 'status' ? viewsortChoice : 'asc'}
                   onClick={() => handleSort('status')}
                 >
                   Status
@@ -116,7 +116,7 @@ export function OrdersTable({ orders, title, emptyMessage }: OrdersTableProps) {
             {sortedOrders.length > 0 ? (
               sortedOrders.map((order, index) => (
                 <TableRow key={order.id}>
-                  <TableCell>{order === 'desc' ? sortedOrders.length - index : index + 1}</TableCell>
+                  <TableCell>{viewsortChoice === 'desc' ? sortedOrders.length - index : index + 1}</TableCell>
                   <TableCell>{formatDate(order.timestamp)}</TableCell>
                   <TableCell>{order.id}</TableCell>
                   <TableCell>{order.symbol}</TableCell>

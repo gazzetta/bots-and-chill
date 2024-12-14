@@ -187,7 +187,7 @@ export default function CreateBotPage() {
     const timer = setTimeout(async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/trading-pairs/search?q=${searchTerm}&exchange=${formData.exchangeKey.exchange}`);
+        const response = await fetch(`/api/trading-pairs/search?q=${searchTerm}&exchange=${formData.exchangeKey?.exchange}`);
         const data = await response.json();
         
         if (data.success) {

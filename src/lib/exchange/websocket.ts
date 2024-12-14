@@ -197,13 +197,13 @@ export class BinanceWebSocket {
     try {
       // Only process TRADE execution types (actual fills)
       if (event.x !== 'TRADE') {
-        wsLog(`Skipping non-TRADE execution type: ${event.x}`);
+        wsLog('INFO', `Skipping non-TRADE execution type: ${event.x}`);
         return;
       }
 
       // Skip processing (but we already logged) market orders
       if (event.o === 'MARKET') {
-        wsLog(`Market order received (not processing): ${event.i}`);
+        wsLog('INFO', `Market order received (not processing): ${event.i}`);
         return;
       }
 
@@ -226,7 +226,7 @@ export class BinanceWebSocket {
 
       // Skip if order not found (might be a new order being created via CCXT)
       if (!order) {
-        wsLog(`Order not found in DB: ${event.i}`);
+        wsLog('INFO', `Order not found in DB: ${event.i}`);
         return;
       }
 

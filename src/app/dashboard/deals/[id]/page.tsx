@@ -169,9 +169,11 @@ function DebugActionsModal({
               <ListItemText
                 primary={`${action.type}: ${action.description}`}
                 secondary={
-                  <pre style={{ whiteSpace: 'pre-wrap' }}>
-                    {JSON.stringify(action.details, null, 2)}
-                  </pre>
+                  
+                    <span style={{ whiteSpace: 'pre-wrap' }}>
+                      {JSON.stringify(action.details, null, 2)}
+                    </span>
+                  
                 }
               />
             </ListItem>

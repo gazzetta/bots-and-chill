@@ -8,8 +8,10 @@ import { calculateTakeProfitPrice } from '@/lib/exchange/orders';
 import { logMessage, LogType } from '@/lib/logging';
 import { createOrders } from '@/lib/orders/createOrders';
 import { placeBaseOrder } from '@/lib/orders/placeBaseOrder';
+import ccxt from 'ccxt';
 
-const DEV_MODE = true; // Set to true for debugging
+const DEV_MODE = process.env.DEV_MODE_MANUAL_CHECKER;
+
 
 interface DealWithRelations extends Deal {
   bot: Bot & {
@@ -36,6 +38,8 @@ interface DebugAction {
 async function failedWebsocketDealChecker(deal: DealWithRelations, exchange: Exchange) {
   const debugActions: DebugAction[] = [];
   try {
+  
+  
     // 1. First check TP status
     const tpOrder = deal.orders.find(o => o.type === OrderType.TAKE_PROFIT);
     let tpFilledIRL = false;
@@ -129,8 +133,8 @@ async function failedWebsocketDealChecker(deal: DealWithRelations, exchange: Exc
           });
         }
 
-        totalQuantity += orderStatus.filled;
-        totalCost += orderStatus.filled * orderStatus.price;
+        totalQuantity = totalQuantity.plus(orderStatus.filled);
+        totalCost = totalCost.plus(orderStatus.filled * orderStatus.price);
         needNewTP = true;
       }
     }
@@ -172,8 +176,8 @@ async function failedWebsocketDealChecker(deal: DealWithRelations, exchange: Exc
         }
       }
 
-      const averagePrice = totalCost / totalQuantity;
-      const newTPPrice = calculateTakeProfitPrice(averagePrice, deal.bot.takeProfit);
+      const averagePrice = totalCost.toNumber() / totalQuantity.toNumber()  ;
+      const newTPPrice = calculateTakeProfitPrice(averagePrice, deal.bot.takeProfit.toNumber());
 
       debugActions.push({
         type: 'CCXT_ORDER',
@@ -198,7 +202,7 @@ async function failedWebsocketDealChecker(deal: DealWithRelations, exchange: Exc
             deal.bot.pair.symbol,
             'limit',
             'sell',
-            totalQuantity,
+            totalQuantity.toNumber(),
             newTPPrice,
             { timeInForce: 'PO', postOnly: true }
           ) as ExchangeOrder;
@@ -249,6 +253,17 @@ async function failedWebsocketDealChecker(deal: DealWithRelations, exchange: Exc
 
     // 4. Update deal totals if needed
     if (needNewTP) {
+      const filledOrders = deal.orders.filter(o => o.status === OrderStatus.FILLED);
+      const totalQuantity = filledOrders.reduce((sum, order) => {
+        return sum + Number(order.filled);
+      }, 0);
+
+      const totalCost = filledOrders.reduce((sum, order) => {
+        return sum + (Number(order.filled) * Number(order.price));
+      }, 0);
+
+      const averagePrice = totalCost / totalQuantity;
+
       debugActions.push({
         type: 'SQL_UPDATE',
         description: 'Would update deal totals',
@@ -257,7 +272,7 @@ async function failedWebsocketDealChecker(deal: DealWithRelations, exchange: Exc
           updates: {
             currentQuantity: totalQuantity,
             totalCost: totalCost,
-            averagePrice: totalCost / totalQuantity
+            averagePrice: averagePrice
           }
         }
       });
@@ -268,7 +283,7 @@ async function failedWebsocketDealChecker(deal: DealWithRelations, exchange: Exc
           data: {
             currentQuantity: totalQuantity,
             totalCost: totalCost,
-            averagePrice: totalCost / totalQuantity
+            averagePrice: averagePrice
           }
         });
       }
@@ -431,13 +446,23 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
+
+    /*if (DEV_MODE) {
+      console.log ("dev mode");
+      return;
+    } else {
+      console.log ("no dev mode");
+      return;
+    }*/
+
+    const {id} = await params;
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
     const deal = await prisma.deal.findUnique({
-      where: { id: params.id },
+      where: { id: id },
       include: {
         bot: {
           include: {

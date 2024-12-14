@@ -163,7 +163,7 @@ export async function GET(
     } catch (exchangeError) {
       console.error('Exchange error:', exchangeError);
       return NextResponse.json(
-        { success: false, error: `Exchange error: ${exchangeError.message}` },
+        { success: false, error: 'Exchange error 1' },
         { status: 500 }
       );
     }
