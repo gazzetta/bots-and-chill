@@ -71,11 +71,7 @@ const wsLog = (type: 'INFO' | 'ERROR' | 'DEBUG', message: string, data?: any) =>
   }));
 };
 
-// Add this helper function at the top of the file
-const normalizeSymbol = (symbol: string): string => {
-  // Remove all characters except letters and numbers
-  return symbol.replace(/[^A-Z0-9]/g, '');
-};
+
 
 export class BinanceWebSocket {
   private ws: WebSocket | null = null;

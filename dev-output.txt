@@ -7,491 +7,60 @@
    - Environments: .env
 
  ✓ Starting...
- ✓ Ready in 4s
+ ✓ Ready in 9.1s
  ○ Compiling /src/middleware ...
- ✓ Compiled /src/middleware in 1137ms (208 modules)
- ○ Compiling /api/test/orders/[id] ...
- ✓ Compiled /api/test/orders/[id] in 6.1s (898 modules)
-prisma:query SELECT "public"."ExchangeKey"."id", "public"."ExchangeKey"."userId", "public"."ExchangeKey"."exchange", "public"."ExchangeKey"."name", "public"."ExchangeKey"."apiKey", "public"."ExchangeKey"."apiSecret", "public"."ExchangeKey"."isTestnet", "public"."ExchangeKey"."createdAt", "public"."ExchangeKey"."updatedAt" FROM "public"."ExchangeKey" WHERE ("public"."ExchangeKey"."userId" = $1 AND "public"."ExchangeKey"."name" = $2 AND "public"."ExchangeKey"."isTestnet" = $3) LIMIT $4 OFFSET $5
- GET /api/test/orders/3009684 200 in 14103ms
- ○ Compiling /dashboard/test ...
- ✓ Compiled /dashboard/test in 10s (2772 modules)
-prisma:query SELECT 1
-prisma:query SELECT "public"."User"."id", "public"."User"."clerkId", "public"."User"."email", "public"."User"."createdAt", "public"."User"."updatedAt" FROM "public"."User" WHERE ("public"."User"."clerkId" = $1 AND 1=1) LIMIT $2 OFFSET $3
- GET /dashboard/test 200 in 12889ms
- GET /dashboard/test 200 in 9133ms
- ○ Compiling /favicon.ico ...
- ✓ Compiled /api/init in 1137ms (1787 modules)
- ✓ Compiled in 1427ms (987 modules)
- GET /favicon.ico 200 in 3969ms
-{
-  "type": "INFO",
-  "message": "All WebSocket connections disconnected",
-  "timestamp": "2024-12-14 01:14:39.410"
-}
-{
-  "type": "INFO",
-  "message": "All WebSocket connections disconnected",
-  "timestamp": "2024-12-14 01:14:39.412"
-}
-prisma:query SELECT "public"."ExchangeKey"."id", "public"."ExchangeKey"."userId", "public"."ExchangeKey"."exchange", "public"."ExchangeKey"."name", "public"."ExchangeKey"."apiKey", "public"."ExchangeKey"."apiSecret", "public"."ExchangeKey"."isTestnet", "public"."ExchangeKey"."createdAt", "public"."ExchangeKey"."updatedAt" FROM "public"."ExchangeKey" WHERE ("public"."ExchangeKey"."id") IN (SELECT "t1"."exchangeKeyId" FROM "public"."Bot" AS "t1" WHERE ("t1"."status" = CAST($1::text AS "public"."BotStatus") AND "t1"."exchangeKeyId" IS NOT NULL)) OFFSET $2
-{
-  "type": "INFO",
-  "message": "Adding WebSocket connection",
-  "data": {
-    "connectionId": "binance_testnet_true",
-    "exchange": "binance_testnet",
-    "isTestnet": true
-  },
-  "timestamp": "2024-12-14 01:14:39.422"
-}
-{"type":"INFO","message":"Attempting WebSocket connection","data":{"testnet":true,"url":"wss://testnet.binance.vision"},"timestamp":"2024-12-14 01:14:39"}
-{"type":"INFO","message":"Obtained listen key","data":{"listenKey":"5nrIXRFGkof3gIDDSEk9AiVVsDvNEVtr7VcVzBtwFuRKuAoHsbVFOi2fdMTS"},"timestamp":"2024-12-14 01:14:39"}
-{
-  "type": "INFO",
-  "message": "New WebSocket connection established",
-  "data": {
-    "connectionId": "binance_testnet_true"
-  },
-  "timestamp": "2024-12-14 01:14:39.763"
-}
- GET /api/init 200 in 3733ms
-{"type":"INFO","message":"WebSocket connection opened","timestamp":"2024-12-14 01:14:40"}
-prisma:query SELECT "public"."ExchangeKey"."id", "public"."ExchangeKey"."userId", "public"."ExchangeKey"."exchange", "public"."ExchangeKey"."name", "public"."ExchangeKey"."apiKey", "public"."ExchangeKey"."apiSecret", "public"."ExchangeKey"."isTestnet", "public"."ExchangeKey"."createdAt", "public"."ExchangeKey"."updatedAt" FROM "public"."ExchangeKey" WHERE ("public"."ExchangeKey"."userId" = $1 AND "public"."ExchangeKey"."name" = $2 AND "public"."ExchangeKey"."isTestnet" = $3) LIMIT $4 OFFSET $5
- GET /api/test/orders/3009684 200 in 3267ms
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:15:10"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:15:40"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:16:10"}
-prisma:query SELECT 1
-prisma:query SELECT "public"."ExchangeKey"."id", "public"."ExchangeKey"."userId", "public"."ExchangeKey"."exchange", "public"."ExchangeKey"."name", "public"."ExchangeKey"."apiKey", "public"."ExchangeKey"."apiSecret", "public"."ExchangeKey"."isTestnet", "public"."ExchangeKey"."createdAt", "public"."ExchangeKey"."updatedAt" FROM "public"."ExchangeKey" WHERE ("public"."ExchangeKey"."userId" = $1 AND "public"."ExchangeKey"."name" = $2 AND "public"."ExchangeKey"."isTestnet" = $3) LIMIT $4 OFFSET $5
- GET /api/test/orders/3009684 200 in 1177ms
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:16:40"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:17:10"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:17:40"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:18:10"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:18:40"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:19:10"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:19:40"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:20:10"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:20:40"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:21:10"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:21:40"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:22:10"}
-prisma:query SELECT "public"."User"."id", "public"."User"."clerkId", "public"."User"."email", "public"."User"."createdAt", "public"."User"."updatedAt" FROM "public"."User" WHERE ("public"."User"."clerkId" = $1 AND 1=1) LIMIT $2 OFFSET $3
- GET /dashboard/test 200 in 1044ms
-{
-  "type": "INFO",
-  "message": "All WebSocket connections disconnected",
-  "timestamp": "2024-12-14 01:22:16.317"
-}
-{
-  "type": "INFO",
-  "message": "All WebSocket connections disconnected",
-  "timestamp": "2024-12-14 01:22:16.317"
-}
-prisma:query SELECT "public"."ExchangeKey"."id", "public"."ExchangeKey"."userId", "public"."ExchangeKey"."exchange", "public"."ExchangeKey"."name", "public"."ExchangeKey"."apiKey", "public"."ExchangeKey"."apiSecret", "public"."ExchangeKey"."isTestnet", "public"."ExchangeKey"."createdAt", "public"."ExchangeKey"."updatedAt" FROM "public"."ExchangeKey" WHERE ("public"."ExchangeKey"."id") IN (SELECT "t1"."exchangeKeyId" FROM "public"."Bot" AS "t1" WHERE ("t1"."status" = CAST($1::text AS "public"."BotStatus") AND "t1"."exchangeKeyId" IS NOT NULL)) OFFSET $2
-{
-  "type": "INFO",
-  "message": "Adding WebSocket connection",
-  "data": {
-    "connectionId": "binance_testnet_true",
-    "exchange": "binance_testnet",
-    "isTestnet": true
-  },
-  "timestamp": "2024-12-14 01:22:16.333"
-}
-{"type":"INFO","message":"Attempting WebSocket connection","data":{"testnet":true,"url":"wss://testnet.binance.vision"},"timestamp":"2024-12-14 01:22:16"}
-{"type":"INFO","message":"WebSocket closed, reconnecting...","timestamp":"2024-12-14 01:22:16"}
-{"type":"INFO","message":"Attempting WebSocket connection","data":{"testnet":true,"url":"wss://testnet.binance.vision"},"timestamp":"2024-12-14 01:22:16"}
-{"type":"INFO","message":"Obtained listen key","data":{"listenKey":"5nrIXRFGkof3gIDDSEk9AiVVsDvNEVtr7VcVzBtwFuRKuAoHsbVFOi2fdMTS"},"timestamp":"2024-12-14 01:22:16"}
-{
-  "type": "INFO",
-  "message": "New WebSocket connection established",
-  "data": {
-    "connectionId": "binance_testnet_true"
-  },
-  "timestamp": "2024-12-14 01:22:16.614"
-}
- GET /api/init 200 in 323ms
- GET /favicon.ico 200 in 18ms
-{"type":"INFO","message":"Obtained listen key","data":{"listenKey":"5nrIXRFGkof3gIDDSEk9AiVVsDvNEVtr7VcVzBtwFuRKuAoHsbVFOi2fdMTS"},"timestamp":"2024-12-14 01:22:16"}
-{"type":"INFO","message":"WebSocket connection opened","timestamp":"2024-12-14 01:22:17"}
-{"type":"INFO","message":"WebSocket connection opened","timestamp":"2024-12-14 01:22:17"}
-prisma:query SELECT "public"."ExchangeKey"."id", "public"."ExchangeKey"."userId", "public"."ExchangeKey"."exchange", "public"."ExchangeKey"."name", "public"."ExchangeKey"."apiKey", "public"."ExchangeKey"."apiSecret", "public"."ExchangeKey"."isTestnet", "public"."ExchangeKey"."createdAt", "public"."ExchangeKey"."updatedAt" FROM "public"."ExchangeKey" WHERE ("public"."ExchangeKey"."userId" = $1 AND "public"."ExchangeKey"."name" = $2 AND "public"."ExchangeKey"."isTestnet" = $3) LIMIT $4 OFFSET $5
- GET /api/test/orders/3009684 200 in 1177ms
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:22:46"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:22:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:23:16"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:23:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:23:46"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:23:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:24:16"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:24:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:24:46"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:24:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:25:16"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:25:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:25:46"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:25:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:26:16"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:26:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:26:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:26:47"}
-{"type":"INFO","message":"Raw WebSocket message received","data":{"data":{"e":"executionReport","E":1734139614933,"s":"CRVUSDT","c":"x-R4BD3S82303a953e9d9c4cf6995d3b","S":"SELL","o":"LIMIT_MAKER","f":"GTC","q":"8.80000000","p":"1.15390000","P":"0.00000000","F":"0.00000000","g":-1,"C":"","x":"TRADE","X":"FILLED","r":"NONE","i":3009684,"l":"8.80000000","z":"8.80000000","L":"1.15390000","n":"0.00000000","N":"USDT","T":1734139614933,"t":362040,"I":6405238,"w":false,"m":true,"M":true,"O":1734126604711,"Z":"10.15432000","Y":"10.15432000","Q":"0.00000000","W":1734126604711,"V":"EXPIRE_MAKER"}},"timestamp":"2024-12-14 01:26:55"}
-{"type":"INFO","message":"WebSocket Order Update","data":{"executionType":"TRADE","orderStatus":"FILLED","orderType":"LIMIT_MAKER","symbol":"CRVUSDT","side":"SELL","quantity":"8.80000000","price":"1.15390000","lastPrice":"1.15390000","orderId":3009684,"clientOrderId":"x-R4BD3S82303a953e9d9c4cf6995d3b","transactionTime":"2024-12-14T01:26:54.933Z"},"timestamp":"2024-12-14 01:26:55"}
-{"type":"INFO","message":"Raw WebSocket message received","data":{"data":{"e":"executionReport","E":1734139614933,"s":"CRVUSDT","c":"x-R4BD3S82303a953e9d9c4cf6995d3b","S":"SELL","o":"LIMIT_MAKER","f":"GTC","q":"8.80000000","p":"1.15390000","P":"0.00000000","F":"0.00000000","g":-1,"C":"","x":"TRADE","X":"FILLED","r":"NONE","i":3009684,"l":"8.80000000","z":"8.80000000","L":"1.15390000","n":"0.00000000","N":"USDT","T":1734139614933,"t":362040,"I":6405238,"w":false,"m":true,"M":true,"O":1734126604711,"Z":"10.15432000","Y":"10.15432000","Q":"0.00000000","W":1734126604711,"V":"EXPIRE_MAKER"}},"timestamp":"2024-12-14 01:26:55"}
-{"type":"INFO","message":"WebSocket Order Update","data":{"executionType":"TRADE","orderStatus":"FILLED","orderType":"LIMIT_MAKER","symbol":"CRVUSDT","side":"SELL","quantity":"8.80000000","price":"1.15390000","lastPrice":"1.15390000","orderId":3009684,"clientOrderId":"x-R4BD3S82303a953e9d9c4cf6995d3b","transactionTime":"2024-12-14T01:26:54.933Z"},"timestamp":"2024-12-14 01:26:55"}
-prisma:query SELECT 1
-{"type":"INFO","message":"Raw WebSocket message received","data":{"data":{"e":"outboundAccountPosition","E":1734139614933,"u":1734139614933,"B":[{"a":"USDT","f":"8725.40889670","l":"151.45222000"},{"a":"CRV","f":"2181.60000000","l":"8.50000000"}]}},"timestamp":"2024-12-14 01:26:55"}
-{"type":"INFO","message":"Account update received","data":{"updateTime":"2024-12-14T01:26:54.933Z"},"timestamp":"2024-12-14 01:26:55"}
-{"type":"INFO","message":"Raw WebSocket message received","data":{"data":{"e":"outboundAccountPosition","E":1734139614933,"u":1734139614933,"B":[{"a":"USDT","f":"8725.40889670","l":"151.45222000"},{"a":"CRV","f":"2181.60000000","l":"8.50000000"}]}},"timestamp":"2024-12-14 01:26:55"}
-{"type":"INFO","message":"Account update received","data":{"updateTime":"2024-12-14T01:26:54.933Z"},"timestamp":"2024-12-14 01:26:55"}
-prisma:query SELECT "public"."Order"."id", "public"."Order"."dealId", "public"."Order"."type"::text, "public"."Order"."side"::text, "public"."Order"."method"::text, "public"."Order"."status"::text, "public"."Order"."symbol", "public"."Order"."quantity", "public"."Order"."price", "public"."Order"."filled", "public"."Order"."remaining", "public"."Order"."cost", "public"."Order"."createdAt", "public"."Order"."updatedAt", "public"."Order"."filledAt", "public"."Order"."exchangeOrderId" FROM "public"."Order" WHERE ("public"."Order"."exchangeOrderId" = $1 AND "public"."Order"."symbol" = $2) LIMIT $3 OFFSET $4
-{"type":"Order not found in DB: 3009684","timestamp":"2024-12-14 01:26:55"}
-prisma:query SELECT "public"."Order"."id", "public"."Order"."dealId", "public"."Order"."type"::text, "public"."Order"."side"::text, "public"."Order"."method"::text, "public"."Order"."status"::text, "public"."Order"."symbol", "public"."Order"."quantity", "public"."Order"."price", "public"."Order"."filled", "public"."Order"."remaining", "public"."Order"."cost", "public"."Order"."createdAt", "public"."Order"."updatedAt", "public"."Order"."filledAt", "public"."Order"."exchangeOrderId" FROM "public"."Order" WHERE ("public"."Order"."exchangeOrderId" = $1 AND "public"."Order"."symbol" = $2) LIMIT $3 OFFSET $4
-{"type":"Order not found in DB: 3009684","timestamp":"2024-12-14 01:26:55"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:27:16"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:27:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:27:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:27:47"}
-prisma:query SELECT 1
-prisma:query SELECT "public"."ExchangeKey"."id", "public"."ExchangeKey"."userId", "public"."ExchangeKey"."exchange", "public"."ExchangeKey"."name", "public"."ExchangeKey"."apiKey", "public"."ExchangeKey"."apiSecret", "public"."ExchangeKey"."isTestnet", "public"."ExchangeKey"."createdAt", "public"."ExchangeKey"."updatedAt" FROM "public"."ExchangeKey" WHERE ("public"."ExchangeKey"."userId" = $1 AND "public"."ExchangeKey"."name" = $2 AND "public"."ExchangeKey"."isTestnet" = $3) LIMIT $4 OFFSET $5
- GET /api/test/orders/3009684 200 in 1136ms
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:28:16"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:28:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:28:46"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:28:47"}
+ ✓ Compiled /src/middleware in 863ms (208 modules)
  ○ Compiling /dashboard/deals ...
- ✓ Compiled /dashboard/deals in 7.2s (3779 modules)
- GET /dashboard/deals 200 in 7691ms
+ ✓ Compiled /dashboard/deals in 11.5s (3314 modules)
+ GET /dashboard/deals 200 in 13166ms
  ○ Compiling /api/deals ...
- ✓ Compiled /api/deals in 1709ms (3781 modules)
-prisma:query SELECT 1
+ ✓ Compiled /api/deals in 4.5s (3321 modules)
 prisma:query SELECT "public"."Deal"."id", "public"."Deal"."botId", "public"."Deal"."status"::text, "public"."Deal"."startedAt", "public"."Deal"."updatedAt", "public"."Deal"."closedAt", "public"."Deal"."currentQuantity", "public"."Deal"."averagePrice", "public"."Deal"."totalCost", "public"."Deal"."currentProfit", "public"."Deal"."actualSafetyOrders", "public"."Deal"."warningMessage" FROM "public"."Deal" LEFT JOIN "public"."Bot" AS "j1" ON ("j1"."id") = ("public"."Deal"."botId") WHERE (("j1"."userId" = $1 AND ("j1"."id" IS NOT NULL)) AND "public"."Deal"."status" <> CAST($2::text AS "public"."DealStatus")) ORDER BY "public"."Deal"."startedAt" DESC OFFSET $3
 prisma:query SELECT "public"."Bot"."id", "public"."Bot"."userId", "public"."Bot"."pairId", "public"."Bot"."baseOrderSize", "public"."Bot"."maxSafetyOrders", "public"."Bot"."priceDeviation", "public"."Bot"."safetyOrderSize", "public"."Bot"."safetyOrderPriceStep", "public"."Bot"."safetyOrderVolumeStep", "public"."Bot"."takeProfit", "public"."Bot"."mode", "public"."Bot"."createdAt", "public"."Bot"."updatedAt", "public"."Bot"."name", "public"."Bot"."exchangeKeyId", "public"."Bot"."status"::text FROM "public"."Bot" WHERE "public"."Bot"."id" IN ($1,$2) OFFSET $3
 prisma:query SELECT "public"."TradingPair"."id", "public"."TradingPair"."exchange", "public"."TradingPair"."symbol", "public"."TradingPair"."baseAsset", "public"."TradingPair"."quoteAsset", "public"."TradingPair"."minQuantity", "public"."TradingPair"."maxQuantity", "public"."TradingPair"."stepSize", "public"."TradingPair"."minNotional", "public"."TradingPair"."isSpot", "public"."TradingPair"."isActive", "public"."TradingPair"."createdAt", "public"."TradingPair"."updatedAt" FROM "public"."TradingPair" WHERE "public"."TradingPair"."id" IN ($1,$2) OFFSET $3
 prisma:query SELECT "public"."Order"."id", "public"."Order"."dealId", "public"."Order"."type"::text, "public"."Order"."side"::text, "public"."Order"."method"::text, "public"."Order"."status"::text, "public"."Order"."symbol", "public"."Order"."quantity", "public"."Order"."price", "public"."Order"."filled", "public"."Order"."remaining", "public"."Order"."cost", "public"."Order"."createdAt", "public"."Order"."updatedAt", "public"."Order"."filledAt", "public"."Order"."exchangeOrderId" FROM "public"."Order" WHERE (("public"."Order"."type" = CAST($1::text AS "public"."OrderType") OR "public"."Order"."type" = CAST($2::text AS "public"."OrderType")) AND "public"."Order"."dealId" IN ($3,$4)) OFFSET $5
- GET /api/deals 200 in 2027ms
+ GET /api/deals 200 in 5164ms
 prisma:query SELECT "public"."Deal"."id", "public"."Deal"."botId", "public"."Deal"."status"::text, "public"."Deal"."startedAt", "public"."Deal"."updatedAt", "public"."Deal"."closedAt", "public"."Deal"."currentQuantity", "public"."Deal"."averagePrice", "public"."Deal"."totalCost", "public"."Deal"."currentProfit", "public"."Deal"."actualSafetyOrders", "public"."Deal"."warningMessage" FROM "public"."Deal" LEFT JOIN "public"."Bot" AS "j1" ON ("j1"."id") = ("public"."Deal"."botId") WHERE (("j1"."userId" = $1 AND ("j1"."id" IS NOT NULL)) AND "public"."Deal"."status" <> CAST($2::text AS "public"."DealStatus")) ORDER BY "public"."Deal"."startedAt" DESC OFFSET $3
 prisma:query SELECT "public"."Bot"."id", "public"."Bot"."userId", "public"."Bot"."pairId", "public"."Bot"."baseOrderSize", "public"."Bot"."maxSafetyOrders", "public"."Bot"."priceDeviation", "public"."Bot"."safetyOrderSize", "public"."Bot"."safetyOrderPriceStep", "public"."Bot"."safetyOrderVolumeStep", "public"."Bot"."takeProfit", "public"."Bot"."mode", "public"."Bot"."createdAt", "public"."Bot"."updatedAt", "public"."Bot"."name", "public"."Bot"."exchangeKeyId", "public"."Bot"."status"::text FROM "public"."Bot" WHERE "public"."Bot"."id" IN ($1,$2) OFFSET $3
 prisma:query SELECT "public"."TradingPair"."id", "public"."TradingPair"."exchange", "public"."TradingPair"."symbol", "public"."TradingPair"."baseAsset", "public"."TradingPair"."quoteAsset", "public"."TradingPair"."minQuantity", "public"."TradingPair"."maxQuantity", "public"."TradingPair"."stepSize", "public"."TradingPair"."minNotional", "public"."TradingPair"."isSpot", "public"."TradingPair"."isActive", "public"."TradingPair"."createdAt", "public"."TradingPair"."updatedAt" FROM "public"."TradingPair" WHERE "public"."TradingPair"."id" IN ($1,$2) OFFSET $3
 prisma:query SELECT "public"."Order"."id", "public"."Order"."dealId", "public"."Order"."type"::text, "public"."Order"."side"::text, "public"."Order"."method"::text, "public"."Order"."status"::text, "public"."Order"."symbol", "public"."Order"."quantity", "public"."Order"."price", "public"."Order"."filled", "public"."Order"."remaining", "public"."Order"."cost", "public"."Order"."createdAt", "public"."Order"."updatedAt", "public"."Order"."filledAt", "public"."Order"."exchangeOrderId" FROM "public"."Order" WHERE (("public"."Order"."type" = CAST($1::text AS "public"."OrderType") OR "public"."Order"."type" = CAST($2::text AS "public"."OrderType")) AND "public"."Order"."dealId" IN ($3,$4)) OFFSET $5
- GET /api/deals 200 in 24ms
+ GET /api/deals 200 in 32ms
+ GET /dashboard/deals 200 in 157ms
+ ○ Compiling /dashboard/bots ...
+ ✓ Compiled /dashboard/bots in 3.1s (3350 modules)
+ GET /dashboard/bots 200 in 3511ms
+ ○ Compiling /dashboard/test ...
+ ✓ Compiled /dashboard/test in 4.5s (3359 modules)
+ GET /dashboard/test 200 in 4720ms
+ GET /dashboard/deals 200 in 43ms
+ ○ Compiling /api/deals ...
+ ✓ Compiled /api/deals in 972ms (1835 modules)
+prisma:query SELECT "public"."Deal"."id", "public"."Deal"."botId", "public"."Deal"."status"::text, "public"."Deal"."startedAt", "public"."Deal"."updatedAt", "public"."Deal"."closedAt", "public"."Deal"."currentQuantity", "public"."Deal"."averagePrice", "public"."Deal"."totalCost", "public"."Deal"."currentProfit", "public"."Deal"."actualSafetyOrders", "public"."Deal"."warningMessage" FROM "public"."Deal" LEFT JOIN "public"."Bot" AS "j1" ON ("j1"."id") = ("public"."Deal"."botId") WHERE (("j1"."userId" = $1 AND ("j1"."id" IS NOT NULL)) AND "public"."Deal"."status" <> CAST($2::text AS "public"."DealStatus")) ORDER BY "public"."Deal"."startedAt" DESC OFFSET $3
+prisma:query SELECT "public"."Bot"."id", "public"."Bot"."userId", "public"."Bot"."pairId", "public"."Bot"."baseOrderSize", "public"."Bot"."maxSafetyOrders", "public"."Bot"."priceDeviation", "public"."Bot"."safetyOrderSize", "public"."Bot"."safetyOrderPriceStep", "public"."Bot"."safetyOrderVolumeStep", "public"."Bot"."takeProfit", "public"."Bot"."mode", "public"."Bot"."createdAt", "public"."Bot"."updatedAt", "public"."Bot"."name", "public"."Bot"."exchangeKeyId", "public"."Bot"."status"::text FROM "public"."Bot" WHERE "public"."Bot"."id" IN ($1,$2) OFFSET $3
+prisma:query SELECT "public"."TradingPair"."id", "public"."TradingPair"."exchange", "public"."TradingPair"."symbol", "public"."TradingPair"."baseAsset", "public"."TradingPair"."quoteAsset", "public"."TradingPair"."minQuantity", "public"."TradingPair"."maxQuantity", "public"."TradingPair"."stepSize", "public"."TradingPair"."minNotional", "public"."TradingPair"."isSpot", "public"."TradingPair"."isActive", "public"."TradingPair"."createdAt", "public"."TradingPair"."updatedAt" FROM "public"."TradingPair" WHERE "public"."TradingPair"."id" IN ($1,$2) OFFSET $3
+prisma:query SELECT "public"."Order"."id", "public"."Order"."dealId", "public"."Order"."type"::text, "public"."Order"."side"::text, "public"."Order"."method"::text, "public"."Order"."status"::text, "public"."Order"."symbol", "public"."Order"."quantity", "public"."Order"."price", "public"."Order"."filled", "public"."Order"."remaining", "public"."Order"."cost", "public"."Order"."createdAt", "public"."Order"."updatedAt", "public"."Order"."filledAt", "public"."Order"."exchangeOrderId" FROM "public"."Order" WHERE (("public"."Order"."type" = CAST($1::text AS "public"."OrderType") OR "public"."Order"."type" = CAST($2::text AS "public"."OrderType")) AND "public"."Order"."dealId" IN ($3,$4)) OFFSET $5
+ GET /api/deals 200 in 1393ms
+prisma:query SELECT "public"."Deal"."id", "public"."Deal"."botId", "public"."Deal"."status"::text, "public"."Deal"."startedAt", "public"."Deal"."updatedAt", "public"."Deal"."closedAt", "public"."Deal"."currentQuantity", "public"."Deal"."averagePrice", "public"."Deal"."totalCost", "public"."Deal"."currentProfit", "public"."Deal"."actualSafetyOrders", "public"."Deal"."warningMessage" FROM "public"."Deal" LEFT JOIN "public"."Bot" AS "j1" ON ("j1"."id") = ("public"."Deal"."botId") WHERE (("j1"."userId" = $1 AND ("j1"."id" IS NOT NULL)) AND "public"."Deal"."status" <> CAST($2::text AS "public"."DealStatus")) ORDER BY "public"."Deal"."startedAt" DESC OFFSET $3
+prisma:query SELECT "public"."Bot"."id", "public"."Bot"."userId", "public"."Bot"."pairId", "public"."Bot"."baseOrderSize", "public"."Bot"."maxSafetyOrders", "public"."Bot"."priceDeviation", "public"."Bot"."safetyOrderSize", "public"."Bot"."safetyOrderPriceStep", "public"."Bot"."safetyOrderVolumeStep", "public"."Bot"."takeProfit", "public"."Bot"."mode", "public"."Bot"."createdAt", "public"."Bot"."updatedAt", "public"."Bot"."name", "public"."Bot"."exchangeKeyId", "public"."Bot"."status"::text FROM "public"."Bot" WHERE "public"."Bot"."id" IN ($1,$2) OFFSET $3
+prisma:query SELECT "public"."TradingPair"."id", "public"."TradingPair"."exchange", "public"."TradingPair"."symbol", "public"."TradingPair"."baseAsset", "public"."TradingPair"."quoteAsset", "public"."TradingPair"."minQuantity", "public"."TradingPair"."maxQuantity", "public"."TradingPair"."stepSize", "public"."TradingPair"."minNotional", "public"."TradingPair"."isSpot", "public"."TradingPair"."isActive", "public"."TradingPair"."createdAt", "public"."TradingPair"."updatedAt" FROM "public"."TradingPair" WHERE "public"."TradingPair"."id" IN ($1,$2) OFFSET $3
+prisma:query SELECT "public"."Order"."id", "public"."Order"."dealId", "public"."Order"."type"::text, "public"."Order"."side"::text, "public"."Order"."method"::text, "public"."Order"."status"::text, "public"."Order"."symbol", "public"."Order"."quantity", "public"."Order"."price", "public"."Order"."filled", "public"."Order"."remaining", "public"."Order"."cost", "public"."Order"."createdAt", "public"."Order"."updatedAt", "public"."Order"."filledAt", "public"."Order"."exchangeOrderId" FROM "public"."Order" WHERE (("public"."Order"."type" = CAST($1::text AS "public"."OrderType") OR "public"."Order"."type" = CAST($2::text AS "public"."OrderType")) AND "public"."Order"."dealId" IN ($3,$4)) OFFSET $5
+ GET /api/deals 200 in 34ms
  ○ Compiling /dashboard/deals/[id] ...
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:29:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:29:17"}
- ✓ Compiled /dashboard/deals/[id] in 2.7s (3838 modules)
- GET /dashboard/deals/cm4na7dhz0001118owbrmuids 200 in 5073ms
+ ✓ Compiled /dashboard/deals/[id] in 3.4s (2838 modules)
+ GET /dashboard/deals/cm4na7dhz0001118owbrmuids 200 in 4725ms
  ○ Compiling /api/deals/[id] ...
- ✓ Compiled /api/deals/[id] in 1580ms (3389 modules)
+ ✓ Compiled /api/deals/[id] in 1145ms (2844 modules)
 prisma:query SELECT 1
 prisma:query SELECT "public"."Deal"."id", "public"."Deal"."botId", "public"."Deal"."status"::text, "public"."Deal"."startedAt", "public"."Deal"."updatedAt", "public"."Deal"."closedAt", "public"."Deal"."currentQuantity", "public"."Deal"."averagePrice", "public"."Deal"."totalCost", "public"."Deal"."currentProfit", "public"."Deal"."actualSafetyOrders", "public"."Deal"."warningMessage" FROM "public"."Deal" WHERE ("public"."Deal"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
 prisma:query SELECT "public"."Bot"."id", "public"."Bot"."userId", "public"."Bot"."pairId", "public"."Bot"."baseOrderSize", "public"."Bot"."maxSafetyOrders", "public"."Bot"."priceDeviation", "public"."Bot"."safetyOrderSize", "public"."Bot"."safetyOrderPriceStep", "public"."Bot"."safetyOrderVolumeStep", "public"."Bot"."takeProfit", "public"."Bot"."mode", "public"."Bot"."createdAt", "public"."Bot"."updatedAt", "public"."Bot"."name", "public"."Bot"."exchangeKeyId", "public"."Bot"."status"::text FROM "public"."Bot" WHERE "public"."Bot"."id" IN ($1) OFFSET $2
 prisma:query SELECT "public"."TradingPair"."id", "public"."TradingPair"."exchange", "public"."TradingPair"."symbol", "public"."TradingPair"."baseAsset", "public"."TradingPair"."quoteAsset", "public"."TradingPair"."minQuantity", "public"."TradingPair"."maxQuantity", "public"."TradingPair"."stepSize", "public"."TradingPair"."minNotional", "public"."TradingPair"."isSpot", "public"."TradingPair"."isActive", "public"."TradingPair"."createdAt", "public"."TradingPair"."updatedAt" FROM "public"."TradingPair" WHERE "public"."TradingPair"."id" IN ($1) OFFSET $2
 prisma:query SELECT "public"."Order"."id", "public"."Order"."type"::text, "public"."Order"."status"::text, "public"."Order"."quantity", "public"."Order"."price", "public"."Order"."filled", "public"."Order"."filledAt", "public"."Order"."createdAt", "public"."Order"."exchangeOrderId", "public"."Order"."dealId" FROM "public"."Order" WHERE "public"."Order"."dealId" IN ($1) ORDER BY "public"."Order"."createdAt" ASC OFFSET $2
- GET /api/deals/cm4na7dhz0001118owbrmuids 200 in 3835ms
+ GET /api/deals/cm4na7dhz0001118owbrmuids 200 in 3236ms
 prisma:query SELECT "public"."Deal"."id", "public"."Deal"."botId", "public"."Deal"."status"::text, "public"."Deal"."startedAt", "public"."Deal"."updatedAt", "public"."Deal"."closedAt", "public"."Deal"."currentQuantity", "public"."Deal"."averagePrice", "public"."Deal"."totalCost", "public"."Deal"."currentProfit", "public"."Deal"."actualSafetyOrders", "public"."Deal"."warningMessage" FROM "public"."Deal" WHERE ("public"."Deal"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
 prisma:query SELECT "public"."Bot"."id", "public"."Bot"."userId", "public"."Bot"."pairId", "public"."Bot"."baseOrderSize", "public"."Bot"."maxSafetyOrders", "public"."Bot"."priceDeviation", "public"."Bot"."safetyOrderSize", "public"."Bot"."safetyOrderPriceStep", "public"."Bot"."safetyOrderVolumeStep", "public"."Bot"."takeProfit", "public"."Bot"."mode", "public"."Bot"."createdAt", "public"."Bot"."updatedAt", "public"."Bot"."name", "public"."Bot"."exchangeKeyId", "public"."Bot"."status"::text FROM "public"."Bot" WHERE "public"."Bot"."id" IN ($1) OFFSET $2
 prisma:query SELECT "public"."TradingPair"."id", "public"."TradingPair"."exchange", "public"."TradingPair"."symbol", "public"."TradingPair"."baseAsset", "public"."TradingPair"."quoteAsset", "public"."TradingPair"."minQuantity", "public"."TradingPair"."maxQuantity", "public"."TradingPair"."stepSize", "public"."TradingPair"."minNotional", "public"."TradingPair"."isSpot", "public"."TradingPair"."isActive", "public"."TradingPair"."createdAt", "public"."TradingPair"."updatedAt" FROM "public"."TradingPair" WHERE "public"."TradingPair"."id" IN ($1) OFFSET $2
 prisma:query SELECT "public"."Order"."id", "public"."Order"."type"::text, "public"."Order"."status"::text, "public"."Order"."quantity", "public"."Order"."price", "public"."Order"."filled", "public"."Order"."filledAt", "public"."Order"."createdAt", "public"."Order"."exchangeOrderId", "public"."Order"."dealId" FROM "public"."Order" WHERE "public"."Order"."dealId" IN ($1) ORDER BY "public"."Order"."createdAt" ASC OFFSET $2
- GET /api/deals/cm4na7dhz0001118owbrmuids 200 in 178ms
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:29:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:29:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:30:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:30:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:30:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:30:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:31:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:31:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:31:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:31:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:32:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:32:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:32:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:32:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:33:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:33:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:33:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:33:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:34:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:34:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:34:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:34:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:35:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:35:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:35:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:35:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:36:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:36:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:36:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:36:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:37:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:37:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:37:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:37:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:38:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:38:17"}
- ✓ Compiled in 4.2s (3381 modules)
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:38:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:38:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:39:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:39:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:39:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:39:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:40:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:40:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:40:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:40:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:41:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:41:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:41:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:41:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:42:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:42:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:42:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:42:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:43:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:43:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:43:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:43:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:44:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:44:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:44:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:44:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:45:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:45:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:45:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:45:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:46:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:46:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:46:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:46:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:47:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:47:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:47:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:47:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:48:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:48:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:48:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:48:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:49:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:49:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:49:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:49:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:50:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:50:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:50:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:50:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:51:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:51:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:51:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:51:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:52:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:52:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:52:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:52:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:53:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:53:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:53:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:53:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:54:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:54:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:54:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:54:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:55:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:55:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:55:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:55:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:56:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:56:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:56:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:56:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:57:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:57:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:57:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:57:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:58:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:58:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:58:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:58:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:59:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:59:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:59:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 01:59:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:00:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:00:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:00:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:00:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:01:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:01:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:01:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:01:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:02:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:02:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:02:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:02:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:03:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:03:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:03:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:03:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:04:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:04:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:04:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:04:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:05:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:05:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:05:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:05:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:06:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:06:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:06:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:06:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:07:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:07:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:07:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:07:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:08:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:08:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:08:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:08:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:09:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:09:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:09:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:09:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:10:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:10:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:10:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:10:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:11:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:11:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:11:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:11:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:12:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:12:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:12:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:12:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:13:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:13:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:13:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:13:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:14:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:14:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:14:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:14:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:15:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:15:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:15:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:15:47"}
- ✓ Compiled in 3.8s (3381 modules)
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:16:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:16:17"}
-{"type":"INFO","message":"Raw WebSocket message received","data":{"data":{"e":"executionReport","E":1734142590666,"s":"CRVUSDT","c":"x-R4BD3S8240576b2921d644c1b227be","S":"SELL","o":"LIMIT_MAKER","f":"GTC","q":"8.50000000","p":"1.19970000","P":"0.00000000","F":"0.00000000","g":-1,"C":"","x":"TRADE","X":"FILLED","r":"NONE","i":2983506,"l":"8.50000000","z":"8.50000000","L":"1.19970000","n":"0.00000000","N":"USDT","T":1734142590665,"t":362480,"I":6410109,"w":false,"m":true,"M":true,"O":1734093443744,"Z":"10.19745000","Y":"10.19745000","Q":"0.00000000","W":1734093443744,"V":"EXPIRE_MAKER"}},"timestamp":"2024-12-14 02:16:30"}
-{"type":"INFO","message":"WebSocket Order Update","data":{"executionType":"TRADE","orderStatus":"FILLED","orderType":"LIMIT_MAKER","symbol":"CRVUSDT","side":"SELL","quantity":"8.50000000","price":"1.19970000","lastPrice":"1.19970000","orderId":2983506,"clientOrderId":"x-R4BD3S8240576b2921d644c1b227be","transactionTime":"2024-12-14T02:16:30.665Z"},"timestamp":"2024-12-14 02:16:30"}
-{"type":"INFO","message":"Raw WebSocket message received","data":{"data":{"e":"outboundAccountPosition","E":1734142590666,"u":1734142590665,"B":[{"a":"USDT","f":"8735.60634670","l":"151.45222000"},{"a":"CRV","f":"2181.60000000","l":"0.00000000"}]}},"timestamp":"2024-12-14 02:16:30"}
-{"type":"INFO","message":"Account update received","data":{"updateTime":"2024-12-14T02:16:30.666Z"},"timestamp":"2024-12-14 02:16:30"}
-{"type":"INFO","message":"Raw WebSocket message received","data":{"data":{"e":"executionReport","E":1734142590666,"s":"CRVUSDT","c":"x-R4BD3S8240576b2921d644c1b227be","S":"SELL","o":"LIMIT_MAKER","f":"GTC","q":"8.50000000","p":"1.19970000","P":"0.00000000","F":"0.00000000","g":-1,"C":"","x":"TRADE","X":"FILLED","r":"NONE","i":2983506,"l":"8.50000000","z":"8.50000000","L":"1.19970000","n":"0.00000000","N":"USDT","T":1734142590665,"t":362480,"I":6410109,"w":false,"m":true,"M":true,"O":1734093443744,"Z":"10.19745000","Y":"10.19745000","Q":"0.00000000","W":1734093443744,"V":"EXPIRE_MAKER"}},"timestamp":"2024-12-14 02:16:30"}
-{"type":"INFO","message":"WebSocket Order Update","data":{"executionType":"TRADE","orderStatus":"FILLED","orderType":"LIMIT_MAKER","symbol":"CRVUSDT","side":"SELL","quantity":"8.50000000","price":"1.19970000","lastPrice":"1.19970000","orderId":2983506,"clientOrderId":"x-R4BD3S8240576b2921d644c1b227be","transactionTime":"2024-12-14T02:16:30.665Z"},"timestamp":"2024-12-14 02:16:30"}
-{"type":"INFO","message":"Raw WebSocket message received","data":{"data":{"e":"outboundAccountPosition","E":1734142590666,"u":1734142590665,"B":[{"a":"USDT","f":"8735.60634670","l":"151.45222000"},{"a":"CRV","f":"2181.60000000","l":"0.00000000"}]}},"timestamp":"2024-12-14 02:16:30"}
-{"type":"INFO","message":"Account update received","data":{"updateTime":"2024-12-14T02:16:30.666Z"},"timestamp":"2024-12-14 02:16:30"}
-prisma:query SELECT "public"."Order"."id", "public"."Order"."dealId", "public"."Order"."type"::text, "public"."Order"."side"::text, "public"."Order"."method"::text, "public"."Order"."status"::text, "public"."Order"."symbol", "public"."Order"."quantity", "public"."Order"."price", "public"."Order"."filled", "public"."Order"."remaining", "public"."Order"."cost", "public"."Order"."createdAt", "public"."Order"."updatedAt", "public"."Order"."filledAt", "public"."Order"."exchangeOrderId" FROM "public"."Order" WHERE ("public"."Order"."exchangeOrderId" = $1 AND "public"."Order"."symbol" = $2) LIMIT $3 OFFSET $4
-{"type":"Order not found in DB: 2983506","timestamp":"2024-12-14 02:16:30"}
-prisma:query SELECT "public"."Order"."id", "public"."Order"."dealId", "public"."Order"."type"::text, "public"."Order"."side"::text, "public"."Order"."method"::text, "public"."Order"."status"::text, "public"."Order"."symbol", "public"."Order"."quantity", "public"."Order"."price", "public"."Order"."filled", "public"."Order"."remaining", "public"."Order"."cost", "public"."Order"."createdAt", "public"."Order"."updatedAt", "public"."Order"."filledAt", "public"."Order"."exchangeOrderId" FROM "public"."Order" WHERE ("public"."Order"."exchangeOrderId" = $1 AND "public"."Order"."symbol" = $2) LIMIT $3 OFFSET $4
-{"type":"Order not found in DB: 2983506","timestamp":"2024-12-14 02:16:30"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:16:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:16:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:17:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:17:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:17:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:17:47"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:18:17"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:18:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:18:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:18:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:19:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:19:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:19:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:19:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:20:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:20:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:20:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:20:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:21:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:21:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:21:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:21:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:22:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:22:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:22:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:22:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:23:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:23:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:23:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:23:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:24:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:24:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:24:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:24:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:25:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:25:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:25:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:25:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:26:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:26:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:26:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:26:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:27:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:27:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:27:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:27:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:28:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:28:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:28:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:28:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:29:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:29:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:29:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:29:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:30:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:30:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:30:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:30:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:31:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:31:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:31:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:31:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:32:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:32:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:32:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:32:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:33:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:33:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:33:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:33:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:34:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:34:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:34:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:34:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:35:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:35:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:35:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:35:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:36:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:36:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:36:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:36:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:37:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:37:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:37:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:37:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:38:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:38:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:38:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:38:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:39:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:39:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:39:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:39:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:40:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:40:18"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:40:48"}
-{"type":"INFO","message":"WebSocket ping successful","timestamp":"2024-12-14 02:40:48"}
+ GET /api/deals/cm4na7dhz0001118owbrmuids 200 in 61ms
+ ✓ Compiled in 1090ms (1520 modules)
+ ✓ Compiled in 1968ms (1520 modules)
+ ✓ Compiled in 999ms (1520 modules)
