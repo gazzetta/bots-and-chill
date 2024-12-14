@@ -48,6 +48,7 @@ interface DealDetails {
     price: string | number;
     status: string;
     filledAt?: Date;
+    exchangeOrderId: number;
   }>;
   takeProfit?: {
     price: string | number;
@@ -408,7 +409,12 @@ export default function DealDetailsPage() {
           <TableBody>
             {deal.safetyOrders?.map((so, index) => (
               <TableRow key={so.id}>
-                <TableCell>Safety Order {index + 1}</TableCell>
+                <TableCell>Safety Order {index + 1} <br /> 
+                <Typography variant="caption" color="text.secondary">{so.exchangeOrderId}</Typography>
+                
+
+
+                </TableCell>
                 <TableCell>
                   {formatNumber(so.amount, 8)} {deal.bot.pair.symbol.split('/')[0]}
                 </TableCell>

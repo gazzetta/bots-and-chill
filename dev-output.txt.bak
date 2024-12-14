@@ -1,0 +1,2039 @@
+
+> bots-and-chill@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.0.3
+   - Local:        http://localhost:3000
+   - Environments: .env
+
+ ✓ Starting...
+ ✓ Ready in 4.8s
+ ✓ Compiled /src/middleware in 892ms
+ ✓ Compiled (208 modules)
+ ○ Compiling /dashboard/orders ...
+ ✓ Compiled /dashboard/orders in 9.9s (2296 modules)
+prisma:query SELECT "public"."User"."id", "public"."User"."clerkId", "public"."User"."email", "public"."User"."createdAt", "public"."User"."updatedAt" FROM "public"."User" WHERE ("public"."User"."clerkId" = $1 AND 1=1) LIMIT $2 OFFSET $3
+ GET /dashboard/orders 200 in 11763ms
+ ○ Compiling /api/init ...
+ ✓ Compiled /api/init in 2.9s (1324 modules)
+ ✓ Compiled in 2.3s (977 modules)
+{
+  "type": "INFO",
+  "message": "All WebSocket connections disconnected",
+  "timestamp": "2024-12-13 22:49:18.553"
+}
+{
+  "type": "INFO",
+  "message": "All WebSocket connections disconnected",
+  "timestamp": "2024-12-13 22:49:18.555"
+}
+=== FETCHING EXCHANGE ORDERS ===
+Failed to fetch orders: TypeError: Cannot read properties of undefined (reading 'apiKey')
+    at apiKey (src\lib\exchange\index.ts:6:52)
+    at getExchange (src\app\api\exchange\orders\route.ts:8:38)
+    at run (webpack://next/dist/src/server/route-modules/app-route/module.ts:529:41)
+    at handler (webpack://next/dist/src/server/route-modules/app-route/module.ts:725:18)
+    at fn (node_modules\next\src\server\lib\trace\tracer.ts:351:27)
+    at NoopContextManager.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NoopTracer.startActiveSpan (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18093)
+    at ProxyTracer.startActiveSpan (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18854)
+    at startActiveSpan (node_modules\next\src\server\lib\trace\tracer.ts:304:31)
+    at NoopContextManager.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at spanContext (node_modules\next\src\server\lib\trace\tracer.ts:303:24)
+    at trace (webpack://next/dist/src/server/route-modules/app-route/module.ts:715:26)
+    at run (webpack://next/dist/src/server/route-modules/app-route/module.ts:662:32)
+    at run (webpack://next/dist/src/server/route-modules/app-route/module.ts:661:34)
+    at run (webpack://next/dist/src/server/route-modules/app-route/module.ts:658:60)
+    at handle (node_modules\next\src\server\base-server.ts:2504:47)
+    at doRender (node_modules\next\src\server\base-server.ts:3027:27)
+    at responseGenerator (node_modules\next\src\server\response-cache\index.ts:67:13)
+    at get (node_modules\next\src\server\base-server.ts:3039:48)
+    at renderToResponseWithComponentsImpl (node_modules\next\src\server\base-server.ts:1877:13)
+    at fn (node_modules\next\src\server\lib\trace\tracer.ts:279:13)
+    at trace (node_modules\next\src\server\base-server.ts:1874:23)
+    at renderToResponseWithComponents (node_modules\next\src\server\base-server.ts:3597:26)
+    at async DevServer.renderToResponseImpl (node_modules\next\src\server\base-server.ts:3659:23)
+    at async DevServer.pipeImpl (node_modules\next\src\server\base-server.ts:1698:20)
+    at async NextNodeServer.handleCatchallRenderRequest (node_modules\next\src\server\next-server.ts:1034:6)
+    at async DevServer.handleRequestImpl (node_modules\next\src\server\base-server.ts:1462:8)
+    at async (node_modules\next\src\server\dev\next-dev-server.ts:514:13)
+    at async Span.traceAsyncFn (node_modules\next\src\trace\trace.ts:143:13)
+    at async DevServer.handleRequest (node_modules\next\src\server\dev\next-dev-server.ts:512:19)
+    at async invokeRender (node_modules\next\src\server\lib\router-server.ts:284:10)
+    at async handleRequest (node_modules\next\src\server\lib\router-server.ts:530:15)
+    at async requestHandlerImpl (node_modules\next\src\server\lib\router-server.ts:576:6)
+    at async Server.requestListener (node_modules\next\src\server\lib\start-server.ts:146:6)
+  4 |
+  5 | export const getExchange = async (exchangeKey: ExchangeKey): Promise<ccxt.Exchange> => {
+> 6 |   const decryptedApiKey = await decrypt(exchangeKey.apiKey);
+    |                                                    ^
+  7 |   const decryptedApiSecret = await decrypt(exchangeKey.apiSecret);
+  8 |
+  9 |   // Clean exchange name - remove _testnet suffix
+ GET /api/exchange/orders 500 in 10935ms
+ GET /favicon.ico 200 in 11191ms
+prisma:query SELECT "public"."ExchangeKey"."id", "public"."ExchangeKey"."userId", "public"."ExchangeKey"."exchange", "public"."ExchangeKey"."name", "public"."ExchangeKey"."apiKey", "public"."ExchangeKey"."apiSecret", "public"."ExchangeKey"."isTestnet", "public"."ExchangeKey"."createdAt", "public"."ExchangeKey"."updatedAt" FROM "public"."ExchangeKey" WHERE ("public"."ExchangeKey"."id") IN (SELECT "t1"."exchangeKeyId" FROM "public"."Bot" AS "t1" WHERE ("t1"."status" = CAST($1::text AS "public"."BotStatus") AND "t1"."exchangeKeyId" IS NOT NULL)) OFFSET $2
+{
+  "type": "INFO",
+  "message": "Adding WebSocket connection",
+  "data": {
+    "connectionId": "binance_testnet_true",
+    "exchange": "binance_testnet",
+    "isTestnet": true
+  },
+  "timestamp": "2024-12-13 22:49:21.296"
+}
+{
+  "type": "INFO",
+  "message": "Attempting WebSocket connection",
+  "data": {
+    "testnet": true,
+    "url": "wss://testnet.binance.vision"
+  },
+  "timestamp": "2024-12-13 22:49:21.297"
+}
+{
+  "type": "INFO",
+  "message": "Obtained listen key",
+  "data": {
+    "listenKey": "5nrIXRFGkof3gIDDSEk9AiVVsDvNEVtr7VcVzBtwFuRKuAoHsbVFOi2fdMTS"
+  },
+  "timestamp": "2024-12-13 22:49:21.655"
+}
+{
+  "type": "INFO",
+  "message": "New WebSocket connection established",
+  "data": {
+    "connectionId": "binance_testnet_true"
+  },
+  "timestamp": "2024-12-13 22:49:21.659"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket connections initialized successfully",
+  "timestamp": "2024-12-13 22:49:21.659"
+}
+ GET /api/init 200 in 11331ms
+{
+  "type": "INFO",
+  "message": "WebSocket connection opened",
+  "timestamp": "2024-12-13 22:49:22.379"
+}
+prisma:query SELECT 1
+prisma:query SELECT "public"."User"."id", "public"."User"."clerkId", "public"."User"."email", "public"."User"."createdAt", "public"."User"."updatedAt" FROM "public"."User" WHERE ("public"."User"."clerkId" = $1 AND 1=1) LIMIT $2 OFFSET $3
+ GET /dashboard/orders 200 in 780ms
+ GET /favicon.ico 200 in 18ms
+=== FETCHING EXCHANGE ORDERS ===
+Failed to fetch orders: TypeError: Cannot read properties of undefined (reading 'apiKey')
+    at apiKey (src\lib\exchange\index.ts:6:52)
+    at getExchange (src\app\api\exchange\orders\route.ts:8:38)
+    at run (webpack://next/dist/src/server/route-modules/app-route/module.ts:529:41)
+    at handler (webpack://next/dist/src/server/route-modules/app-route/module.ts:725:18)
+    at fn (node_modules\next\src\server\lib\trace\tracer.ts:351:27)
+    at NoopContextManager.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NoopTracer.startActiveSpan (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18093)
+    at ProxyTracer.startActiveSpan (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18854)
+    at startActiveSpan (node_modules\next\src\server\lib\trace\tracer.ts:304:31)
+    at NoopContextManager.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at spanContext (node_modules\next\src\server\lib\trace\tracer.ts:303:24)
+    at trace (webpack://next/dist/src/server/route-modules/app-route/module.ts:715:26)
+    at run (webpack://next/dist/src/server/route-modules/app-route/module.ts:662:32)
+    at run (webpack://next/dist/src/server/route-modules/app-route/module.ts:661:34)
+    at run (webpack://next/dist/src/server/route-modules/app-route/module.ts:658:60)
+    at handle (node_modules\next\src\server\base-server.ts:2504:47)
+    at doRender (node_modules\next\src\server\base-server.ts:3027:27)
+    at responseGenerator (node_modules\next\src\server\response-cache\index.ts:67:13)
+    at get (node_modules\next\src\server\base-server.ts:3039:48)
+    at renderToResponseWithComponentsImpl (node_modules\next\src\server\base-server.ts:1877:13)
+    at fn (node_modules\next\src\server\lib\trace\tracer.ts:279:13)
+    at trace (node_modules\next\src\server\base-server.ts:1874:23)
+    at renderToResponseWithComponents (node_modules\next\src\server\base-server.ts:3597:26)
+    at async DevServer.renderToResponseImpl (node_modules\next\src\server\base-server.ts:3659:23)
+    at async DevServer.pipeImpl (node_modules\next\src\server\base-server.ts:1698:20)
+    at async NextNodeServer.handleCatchallRenderRequest (node_modules\next\src\server\next-server.ts:1034:6)
+    at async DevServer.handleRequestImpl (node_modules\next\src\server\base-server.ts:1462:8)
+    at async (node_modules\next\src\server\dev\next-dev-server.ts:514:13)
+    at async Span.traceAsyncFn (node_modules\next\src\trace\trace.ts:143:13)
+    at async DevServer.handleRequest (node_modules\next\src\server\dev\next-dev-server.ts:512:19)
+    at async invokeRender (node_modules\next\src\server\lib\router-server.ts:284:10)
+    at async handleRequest (node_modules\next\src\server\lib\router-server.ts:530:15)
+    at async requestHandlerImpl (node_modules\next\src\server\lib\router-server.ts:576:6)
+    at async Server.requestListener (node_modules\next\src\server\lib\start-server.ts:146:6)
+  4 |
+  5 | export const getExchange = async (exchangeKey: ExchangeKey): Promise<ccxt.Exchange> => {
+> 6 |   const decryptedApiKey = await decrypt(exchangeKey.apiKey);
+    |                                                    ^
+  7 |   const decryptedApiSecret = await decrypt(exchangeKey.apiSecret);
+  8 |
+  9 |   // Clean exchange name - remove _testnet suffix
+ GET /api/exchange/orders 500 in 113ms
+{
+  "type": "INFO",
+  "message": "All WebSocket connections disconnected",
+  "timestamp": "2024-12-13 22:49:40.380"
+}
+{
+  "type": "INFO",
+  "message": "All WebSocket connections disconnected",
+  "timestamp": "2024-12-13 22:49:40.381"
+}
+prisma:query SELECT "public"."ExchangeKey"."id", "public"."ExchangeKey"."userId", "public"."ExchangeKey"."exchange", "public"."ExchangeKey"."name", "public"."ExchangeKey"."apiKey", "public"."ExchangeKey"."apiSecret", "public"."ExchangeKey"."isTestnet", "public"."ExchangeKey"."createdAt", "public"."ExchangeKey"."updatedAt" FROM "public"."ExchangeKey" WHERE ("public"."ExchangeKey"."id") IN (SELECT "t1"."exchangeKeyId" FROM "public"."Bot" AS "t1" WHERE ("t1"."status" = CAST($1::text AS "public"."BotStatus") AND "t1"."exchangeKeyId" IS NOT NULL)) OFFSET $2
+{
+  "type": "INFO",
+  "message": "Adding WebSocket connection",
+  "data": {
+    "connectionId": "binance_testnet_true",
+    "exchange": "binance_testnet",
+    "isTestnet": true
+  },
+  "timestamp": "2024-12-13 22:49:40.393"
+}
+{
+  "type": "INFO",
+  "message": "Attempting WebSocket connection",
+  "data": {
+    "testnet": true,
+    "url": "wss://testnet.binance.vision"
+  },
+  "timestamp": "2024-12-13 22:49:40.393"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket closed, reconnecting...",
+  "timestamp": "2024-12-13 22:49:40.656"
+}
+{
+  "type": "INFO",
+  "message": "Attempting WebSocket connection",
+  "data": {
+    "testnet": true,
+    "url": "wss://testnet.binance.vision"
+  },
+  "timestamp": "2024-12-13 22:49:40.656"
+}
+{
+  "type": "INFO",
+  "message": "Obtained listen key",
+  "data": {
+    "listenKey": "5nrIXRFGkof3gIDDSEk9AiVVsDvNEVtr7VcVzBtwFuRKuAoHsbVFOi2fdMTS"
+  },
+  "timestamp": "2024-12-13 22:49:40.693"
+}
+{
+  "type": "INFO",
+  "message": "New WebSocket connection established",
+  "data": {
+    "connectionId": "binance_testnet_true"
+  },
+  "timestamp": "2024-12-13 22:49:40.695"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket connections initialized successfully",
+  "timestamp": "2024-12-13 22:49:40.695"
+}
+ GET /api/init 200 in 457ms
+{
+  "type": "INFO",
+  "message": "Obtained listen key",
+  "data": {
+    "listenKey": "5nrIXRFGkof3gIDDSEk9AiVVsDvNEVtr7VcVzBtwFuRKuAoHsbVFOi2fdMTS"
+  },
+  "timestamp": "2024-12-13 22:49:40.940"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket connection opened",
+  "timestamp": "2024-12-13 22:49:41.391"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket connection opened",
+  "timestamp": "2024-12-13 22:49:41.638"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:50:10.984"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:50:11.223"
+}
+prisma:query SELECT 1
+prisma:query SELECT "public"."User"."id", "public"."User"."clerkId", "public"."User"."email", "public"."User"."createdAt", "public"."User"."updatedAt" FROM "public"."User" WHERE ("public"."User"."clerkId" = $1 AND 1=1) LIMIT $2 OFFSET $3
+ GET /dashboard/orders 200 in 274ms
+ GET /favicon.ico 200 in 25ms
+=== FETCHING EXCHANGE ORDERS ===
+Failed to fetch orders: TypeError: Cannot read properties of undefined (reading 'apiKey')
+    at apiKey (src\lib\exchange\index.ts:6:52)
+    at getExchange (src\app\api\exchange\orders\route.ts:8:38)
+    at run (webpack://next/dist/src/server/route-modules/app-route/module.ts:529:41)
+    at handler (webpack://next/dist/src/server/route-modules/app-route/module.ts:725:18)
+    at fn (node_modules\next\src\server\lib\trace\tracer.ts:351:27)
+    at NoopContextManager.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NoopTracer.startActiveSpan (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18093)
+    at ProxyTracer.startActiveSpan (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18854)
+    at startActiveSpan (node_modules\next\src\server\lib\trace\tracer.ts:304:31)
+    at NoopContextManager.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at spanContext (node_modules\next\src\server\lib\trace\tracer.ts:303:24)
+    at trace (webpack://next/dist/src/server/route-modules/app-route/module.ts:715:26)
+    at run (webpack://next/dist/src/server/route-modules/app-route/module.ts:662:32)
+    at run (webpack://next/dist/src/server/route-modules/app-route/module.ts:661:34)
+    at run (webpack://next/dist/src/server/route-modules/app-route/module.ts:658:60)
+    at handle (node_modules\next\src\server\base-server.ts:2504:47)
+    at doRender (node_modules\next\src\server\base-server.ts:3027:27)
+    at responseGenerator (node_modules\next\src\server\response-cache\index.ts:67:13)
+    at get (node_modules\next\src\server\base-server.ts:3039:48)
+    at renderToResponseWithComponentsImpl (node_modules\next\src\server\base-server.ts:1877:13)
+    at fn (node_modules\next\src\server\lib\trace\tracer.ts:279:13)
+    at trace (node_modules\next\src\server\base-server.ts:1874:23)
+    at renderToResponseWithComponents (node_modules\next\src\server\base-server.ts:3597:26)
+    at async DevServer.renderToResponseImpl (node_modules\next\src\server\base-server.ts:3659:23)
+    at async DevServer.pipeImpl (node_modules\next\src\server\base-server.ts:1698:20)
+    at async NextNodeServer.handleCatchallRenderRequest (node_modules\next\src\server\next-server.ts:1034:6)
+    at async DevServer.handleRequestImpl (node_modules\next\src\server\base-server.ts:1462:8)
+    at async (node_modules\next\src\server\dev\next-dev-server.ts:514:13)
+    at async Span.traceAsyncFn (node_modules\next\src\trace\trace.ts:143:13)
+    at async DevServer.handleRequest (node_modules\next\src\server\dev\next-dev-server.ts:512:19)
+    at async invokeRender (node_modules\next\src\server\lib\router-server.ts:284:10)
+    at async handleRequest (node_modules\next\src\server\lib\router-server.ts:530:15)
+    at async requestHandlerImpl (node_modules\next\src\server\lib\router-server.ts:576:6)
+    at async Server.requestListener (node_modules\next\src\server\lib\start-server.ts:146:6)
+  4 |
+  5 | export const getExchange = async (exchangeKey: ExchangeKey): Promise<ccxt.Exchange> => {
+> 6 |   const decryptedApiKey = await decrypt(exchangeKey.apiKey);
+    |                                                    ^
+  7 |   const decryptedApiSecret = await decrypt(exchangeKey.apiSecret);
+  8 |
+  9 |   // Clean exchange name - remove _testnet suffix
+ GET /api/exchange/orders 500 in 201ms
+{
+  "type": "INFO",
+  "message": "All WebSocket connections disconnected",
+  "timestamp": "2024-12-13 22:50:30.985"
+}
+{
+  "type": "INFO",
+  "message": "All WebSocket connections disconnected",
+  "timestamp": "2024-12-13 22:50:30.985"
+}
+prisma:query SELECT "public"."ExchangeKey"."id", "public"."ExchangeKey"."userId", "public"."ExchangeKey"."exchange", "public"."ExchangeKey"."name", "public"."ExchangeKey"."apiKey", "public"."ExchangeKey"."apiSecret", "public"."ExchangeKey"."isTestnet", "public"."ExchangeKey"."createdAt", "public"."ExchangeKey"."updatedAt" FROM "public"."ExchangeKey" WHERE ("public"."ExchangeKey"."id") IN (SELECT "t1"."exchangeKeyId" FROM "public"."Bot" AS "t1" WHERE ("t1"."status" = CAST($1::text AS "public"."BotStatus") AND "t1"."exchangeKeyId" IS NOT NULL)) OFFSET $2
+{
+  "type": "INFO",
+  "message": "Adding WebSocket connection",
+  "data": {
+    "connectionId": "binance_testnet_true",
+    "exchange": "binance_testnet",
+    "isTestnet": true
+  },
+  "timestamp": "2024-12-13 22:50:30.989"
+}
+{
+  "type": "INFO",
+  "message": "Attempting WebSocket connection",
+  "data": {
+    "testnet": true,
+    "url": "wss://testnet.binance.vision"
+  },
+  "timestamp": "2024-12-13 22:50:30.993"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket closed, reconnecting...",
+  "timestamp": "2024-12-13 22:50:31.325"
+}
+{
+  "type": "INFO",
+  "message": "Attempting WebSocket connection",
+  "data": {
+    "testnet": true,
+    "url": "wss://testnet.binance.vision"
+  },
+  "timestamp": "2024-12-13 22:50:31.325"
+}
+{
+  "type": "INFO",
+  "message": "Obtained listen key",
+  "data": {
+    "listenKey": "5nrIXRFGkof3gIDDSEk9AiVVsDvNEVtr7VcVzBtwFuRKuAoHsbVFOi2fdMTS"
+  },
+  "timestamp": "2024-12-13 22:50:31.332"
+}
+{
+  "type": "INFO",
+  "message": "New WebSocket connection established",
+  "data": {
+    "connectionId": "binance_testnet_true"
+  },
+  "timestamp": "2024-12-13 22:50:31.336"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket connections initialized successfully",
+  "timestamp": "2024-12-13 22:50:31.337"
+}
+ GET /api/init 200 in 374ms
+{
+  "type": "INFO",
+  "message": "Obtained listen key",
+  "data": {
+    "listenKey": "5nrIXRFGkof3gIDDSEk9AiVVsDvNEVtr7VcVzBtwFuRKuAoHsbVFOi2fdMTS"
+  },
+  "timestamp": "2024-12-13 22:50:31.614"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket connection opened",
+  "timestamp": "2024-12-13 22:50:32.069"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket connection opened",
+  "timestamp": "2024-12-13 22:50:32.311"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:50:41.290"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:51:01.629"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:51:01.899"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:51:11.248"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:51:31.660"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:51:31.888"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:51:41.257"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:52:01.636"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:52:01.890"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:52:11.276"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:52:31.685"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:52:31.906"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:52:41.697"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:53:01.654"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:53:01.887"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:53:11.274"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:53:31.690"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:53:31.927"
+}
+ ✓ Compiled in 2.3s (2297 modules)
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:53:41.298"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:54:01.660"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:54:01.935"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:54:11.303"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:54:31.689"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:54:31.943"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:54:41.309"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:55:01.660"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:55:01.912"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:55:11.329"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:55:31.695"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:55:31.950"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:55:41.318"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:56:01.971"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:56:02.115"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:56:11.338"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:56:31.717"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:56:31.952"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:56:41.375"
+}
+prisma:query SELECT "public"."User"."id", "public"."User"."clerkId", "public"."User"."email", "public"."User"."createdAt", "public"."User"."updatedAt" FROM "public"."User" WHERE ("public"."User"."clerkId" = $1 AND 1=1) LIMIT $2 OFFSET $3
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:57:01.898"
+}
+ GET /dashboard/orders 200 in 1914ms
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:57:02.231"
+}
+ ○ Compiling /api/init ...
+ ✓ Compiled /api/init in 985ms (1324 modules)
+ ⚠ ./src/app/api/exchange/orders/route.ts
+Attempted import error: 'auth' is not exported from '@clerk/nextjs' (imported as 'auth').
+
+Import trace for requested module:
+./src/app/api/exchange/orders/route.ts
+
+./src/app/api/exchange/orders/route.ts
+Attempted import error: '@/lib/prisma' does not contain a default export (imported as 'prisma').
+
+Import trace for requested module:
+./src/app/api/exchange/orders/route.ts
+=== FETCHING EXCHANGE ORDERS ===
+1. Checking auth...
+Failed to fetch orders: TypeError: (0 , _clerk_nextjs__WEBPACK_IMPORTED_MODULE_3__.auth) is not a function
+    at auth (src\app\api\exchange\orders\route.ts:12:27)
+    at run (webpack://next/dist/src/server/route-modules/app-route/module.ts:529:41)
+    at handler (webpack://next/dist/src/server/route-modules/app-route/module.ts:725:18)
+    at fn (node_modules\next\src\server\lib\trace\tracer.ts:351:27)
+    at NoopContextManager.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NoopTracer.startActiveSpan (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18093)
+    at ProxyTracer.startActiveSpan (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18854)
+    at startActiveSpan (node_modules\next\src\server\lib\trace\tracer.ts:304:31)
+    at NoopContextManager.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at spanContext (node_modules\next\src\server\lib\trace\tracer.ts:303:24)
+    at trace (webpack://next/dist/src/server/route-modules/app-route/module.ts:715:26)
+    at run (webpack://next/dist/src/server/route-modules/app-route/module.ts:662:32)
+    at run (webpack://next/dist/src/server/route-modules/app-route/module.ts:661:34)
+    at run (webpack://next/dist/src/server/route-modules/app-route/module.ts:658:60)
+    at handle (node_modules\next\src\server\base-server.ts:2504:47)
+    at doRender (node_modules\next\src\server\base-server.ts:3027:27)
+    at responseGenerator (node_modules\next\src\server\response-cache\index.ts:67:13)
+    at get (node_modules\next\src\server\base-server.ts:3039:48)
+    at renderToResponseWithComponentsImpl (node_modules\next\src\server\base-server.ts:1877:13)
+    at fn (node_modules\next\src\server\lib\trace\tracer.ts:279:13)
+    at trace (node_modules\next\src\server\base-server.ts:1874:23)
+    at renderToResponseWithComponents (node_modules\next\src\server\base-server.ts:3597:26)
+    at async DevServer.renderToResponseImpl (node_modules\next\src\server\base-server.ts:3659:23)
+    at async DevServer.pipeImpl (node_modules\next\src\server\base-server.ts:1698:20)
+    at async NextNodeServer.handleCatchallRenderRequest (node_modules\next\src\server\next-server.ts:1034:6)
+    at async DevServer.handleRequestImpl (node_modules\next\src\server\base-server.ts:1462:8)
+    at async (node_modules\next\src\server\dev\next-dev-server.ts:514:13)
+    at async Span.traceAsyncFn (node_modules\next\src\trace\trace.ts:143:13)
+    at async DevServer.handleRequest (node_modules\next\src\server\dev\next-dev-server.ts:512:19)
+    at async invokeRender (node_modules\next\src\server\lib\router-server.ts:284:10)
+    at async handleRequest (node_modules\next\src\server\lib\router-server.ts:530:15)
+    at async requestHandlerImpl (node_modules\next\src\server\lib\router-server.ts:576:6)
+    at async Server.requestListener (node_modules\next\src\server\lib\start-server.ts:146:6)
+  10 |     // 1. Check auth
+  11 |     console.log('1. Checking auth...');
+> 12 |     const { userId } = auth();
+     |                           ^
+  13 |     if (!userId) {
+  14 |       throw new Error('Unauthorized');
+  15 |     }
+Error details: TypeError: (0 , _clerk_nextjs__WEBPACK_IMPORTED_MODULE_3__.auth) is not a function
+    at GET (webpack-internal:///(rsc)/./src/app/api/exchange/orders/route.ts:18:79)
+    at AsyncLocalStorage.run (node:async_hooks:335:14)
+    at AppRouteRouteModule.do (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\next-server\app-route.runtime.dev.js:10:33392)
+    at E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\next-server\app-route.runtime.dev.js:10:42828
+    at E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\lib\trace\tracer.js:171:36
+    at NoopContextManager.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NoopTracer.startActiveSpan (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18093)
+    at ProxyTracer.startActiveSpan (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18854)
+    at E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\lib\trace\tracer.js:153:103
+    at NoopContextManager.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NextTracerImpl.trace (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\lib\trace\tracer.js:153:28)
+    at E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\next-server\app-route.runtime.dev.js:10:42689
+    at AsyncLocalStorage.run (node:async_hooks:346:14)
+    at E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\next-server\app-route.runtime.dev.js:10:40501
+    at AsyncLocalStorage.run (node:async_hooks:346:14)
+    at E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\next-server\app-route.runtime.dev.js:10:40458
+    at AsyncLocalStorage.run (node:async_hooks:346:14)
+    at AppRouteRouteModule.handle (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\next-server\app-route.runtime.dev.js:10:40412)
+    at doRender (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\base-server.js:1455:60)
+    at responseGenerator (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\base-server.js:1814:34)
+    at ResponseCache.get (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\response-cache\index.js:49:20)
+    at DevServer.renderToResponseWithComponentsImpl (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\base-server.js:1824:53)
+    at E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\base-server.js:1071:121
+    at NextTracerImpl.trace (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\lib\trace\tracer.js:136:20)
+    at DevServer.renderToResponseWithComponents (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\base-server.js:1071:41)
+    at DevServer.renderPageComponent (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\base-server.js:2240:35)
+    at async DevServer.renderToResponseImpl (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\base-server.js:2278:32)
+    at async DevServer.pipeImpl (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\base-server.js:960:25)
+    at async NextNodeServer.handleCatchallRenderRequest (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\next-server.js:281:17)
+    at async DevServer.handleRequestImpl (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\base-server.js:853:17)
+    at async E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\dev\next-dev-server.js:373:20
+    at async Span.traceAsyncFn (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\trace\trace.js:153:20)
+    at async DevServer.handleRequest (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\dev\next-dev-server.js:370:24)
+    at async invokeRender (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\lib\router-server.js:183:21)
+    at async handleRequest (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\lib\router-server.js:360:24)
+    at async requestHandlerImpl (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\lib\router-server.js:384:13)
+    at async Server.requestListener (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\lib\start-server.js:142:13)
+ GET /api/exchange/orders 500 in 6037ms
+{
+  "type": "INFO",
+  "message": "All WebSocket connections disconnected",
+  "timestamp": "2024-12-13 22:57:09.298"
+}
+{
+  "type": "INFO",
+  "message": "All WebSocket connections disconnected",
+  "timestamp": "2024-12-13 22:57:09.302"
+}
+ GET /favicon.ico 200 in 6488ms
+prisma:query SELECT "public"."ExchangeKey"."id", "public"."ExchangeKey"."userId", "public"."ExchangeKey"."exchange", "public"."ExchangeKey"."name", "public"."ExchangeKey"."apiKey", "public"."ExchangeKey"."apiSecret", "public"."ExchangeKey"."isTestnet", "public"."ExchangeKey"."createdAt", "public"."ExchangeKey"."updatedAt" FROM "public"."ExchangeKey" WHERE ("public"."ExchangeKey"."id") IN (SELECT "t1"."exchangeKeyId" FROM "public"."Bot" AS "t1" WHERE ("t1"."status" = CAST($1::text AS "public"."BotStatus") AND "t1"."exchangeKeyId" IS NOT NULL)) OFFSET $2
+{
+  "type": "INFO",
+  "message": "Adding WebSocket connection",
+  "data": {
+    "connectionId": "binance_testnet_true",
+    "exchange": "binance_testnet",
+    "isTestnet": true
+  },
+  "timestamp": "2024-12-13 22:57:09.330"
+}
+{
+  "type": "INFO",
+  "message": "Attempting WebSocket connection",
+  "data": {
+    "testnet": true,
+    "url": "wss://testnet.binance.vision"
+  },
+  "timestamp": "2024-12-13 22:57:09.331"
+}
+prisma:query SELECT "public"."User"."id", "public"."User"."clerkId", "public"."User"."email", "public"."User"."createdAt", "public"."User"."updatedAt" FROM "public"."User" WHERE ("public"."User"."clerkId" = $1 AND 1=1) LIMIT $2 OFFSET $3
+ GET /dashboard/orders 200 in 188ms
+{
+  "type": "INFO",
+  "message": "Obtained listen key",
+  "data": {
+    "listenKey": "5nrIXRFGkof3gIDDSEk9AiVVsDvNEVtr7VcVzBtwFuRKuAoHsbVFOi2fdMTS"
+  },
+  "timestamp": "2024-12-13 22:57:09.686"
+}
+{
+  "type": "INFO",
+  "message": "New WebSocket connection established",
+  "data": {
+    "connectionId": "binance_testnet_true"
+  },
+  "timestamp": "2024-12-13 22:57:09.690"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket connections initialized successfully",
+  "timestamp": "2024-12-13 22:57:09.691"
+}
+ GET /api/init 200 in 6612ms
+{
+  "type": "INFO",
+  "message": "WebSocket connection opened",
+  "timestamp": "2024-12-13 22:57:10.372"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:57:11.340"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:57:31.914"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:57:32.153"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:57:39.986"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:57:41.351"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:58:02.157"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:58:02.302"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:58:10.044"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:58:11.348"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:58:32.302"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:58:32.622"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:58:40.032"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:58:41.368"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:59:01.867"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:59:02.142"
+}
+prisma:query SELECT 1
+prisma:query SELECT "public"."User"."id", "public"."User"."clerkId", "public"."User"."email", "public"."User"."createdAt", "public"."User"."updatedAt" FROM "public"."User" WHERE ("public"."User"."clerkId" = $1 AND 1=1) LIMIT $2 OFFSET $3
+ GET /dashboard/orders 200 in 1026ms
+ GET /favicon.ico 200 in 23ms
+=== FETCHING EXCHANGE ORDERS ===
+1. Checking auth...
+Failed to fetch orders: TypeError: (0 , _clerk_nextjs__WEBPACK_IMPORTED_MODULE_3__.auth) is not a function
+    at auth (src\app\api\exchange\orders\route.ts:12:27)
+    at run (webpack://next/dist/src/server/route-modules/app-route/module.ts:529:41)
+    at handler (webpack://next/dist/src/server/route-modules/app-route/module.ts:725:18)
+    at fn (node_modules\next\src\server\lib\trace\tracer.ts:351:27)
+    at NoopContextManager.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NoopTracer.startActiveSpan (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18093)
+    at ProxyTracer.startActiveSpan (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18854)
+    at startActiveSpan (node_modules\next\src\server\lib\trace\tracer.ts:304:31)
+    at NoopContextManager.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at spanContext (node_modules\next\src\server\lib\trace\tracer.ts:303:24)
+    at trace (webpack://next/dist/src/server/route-modules/app-route/module.ts:715:26)
+    at run (webpack://next/dist/src/server/route-modules/app-route/module.ts:662:32)
+    at run (webpack://next/dist/src/server/route-modules/app-route/module.ts:661:34)
+    at run (webpack://next/dist/src/server/route-modules/app-route/module.ts:658:60)
+    at handle (node_modules\next\src\server\base-server.ts:2504:47)
+    at doRender (node_modules\next\src\server\base-server.ts:3027:27)
+    at responseGenerator (node_modules\next\src\server\response-cache\index.ts:67:13)
+    at get (node_modules\next\src\server\base-server.ts:3039:48)
+    at renderToResponseWithComponentsImpl (node_modules\next\src\server\base-server.ts:1877:13)
+    at fn (node_modules\next\src\server\lib\trace\tracer.ts:279:13)
+    at trace (node_modules\next\src\server\base-server.ts:1874:23)
+    at renderToResponseWithComponents (node_modules\next\src\server\base-server.ts:3597:26)
+    at async DevServer.renderToResponseImpl (node_modules\next\src\server\base-server.ts:3659:23)
+    at async DevServer.pipeImpl (node_modules\next\src\server\base-server.ts:1698:20)
+    at async NextNodeServer.handleCatchallRenderRequest (node_modules\next\src\server\next-server.ts:1034:6)
+    at async DevServer.handleRequestImpl (node_modules\next\src\server\base-server.ts:1462:8)
+    at async (node_modules\next\src\server\dev\next-dev-server.ts:514:13)
+    at async Span.traceAsyncFn (node_modules\next\src\trace\trace.ts:143:13)
+    at async DevServer.handleRequest (node_modules\next\src\server\dev\next-dev-server.ts:512:19)
+    at async invokeRender (node_modules\next\src\server\lib\router-server.ts:284:10)
+    at async handleRequest (node_modules\next\src\server\lib\router-server.ts:530:15)
+    at async requestHandlerImpl (node_modules\next\src\server\lib\router-server.ts:576:6)
+    at async Server.requestListener (node_modules\next\src\server\lib\start-server.ts:146:6)
+  10 |     // 1. Check auth
+  11 |     console.log('1. Checking auth...');
+> 12 |     const { userId } = auth();
+     |                           ^
+  13 |     if (!userId) {
+  14 |       throw new Error('Unauthorized');
+  15 |     }
+Error details: TypeError: (0 , _clerk_nextjs__WEBPACK_IMPORTED_MODULE_3__.auth) is not a function
+    at GET (webpack-internal:///(rsc)/./src/app/api/exchange/orders/route.ts:18:79)
+    at AsyncLocalStorage.run (node:async_hooks:335:14)
+    at AppRouteRouteModule.do (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\next-server\app-route.runtime.dev.js:10:33392)
+    at E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\next-server\app-route.runtime.dev.js:10:42828
+    at E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\lib\trace\tracer.js:171:36
+    at NoopContextManager.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NoopTracer.startActiveSpan (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18093)
+    at ProxyTracer.startActiveSpan (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18854)
+    at E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\lib\trace\tracer.js:153:103
+    at NoopContextManager.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NextTracerImpl.trace (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\lib\trace\tracer.js:153:28)
+    at E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\next-server\app-route.runtime.dev.js:10:42689
+    at AsyncLocalStorage.run (node:async_hooks:346:14)
+    at E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\next-server\app-route.runtime.dev.js:10:40501
+    at AsyncLocalStorage.run (node:async_hooks:346:14)
+    at E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\next-server\app-route.runtime.dev.js:10:40458
+    at AsyncLocalStorage.run (node:async_hooks:346:14)
+    at AppRouteRouteModule.handle (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\next-server\app-route.runtime.dev.js:10:40412)
+    at doRender (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\base-server.js:1455:60)
+    at responseGenerator (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\base-server.js:1814:34)
+    at ResponseCache.get (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\response-cache\index.js:49:20)
+    at DevServer.renderToResponseWithComponentsImpl (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\base-server.js:1824:53)
+    at E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\base-server.js:1071:121
+    at NextTracerImpl.trace (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\lib\trace\tracer.js:136:20)
+    at DevServer.renderToResponseWithComponents (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\base-server.js:1071:41)
+    at DevServer.renderPageComponent (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\base-server.js:2240:35)
+    at async DevServer.renderToResponseImpl (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\base-server.js:2278:32)
+    at async DevServer.pipeImpl (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\base-server.js:960:25)
+    at async NextNodeServer.handleCatchallRenderRequest (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\next-server.js:281:17)
+    at async DevServer.handleRequestImpl (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\base-server.js:853:17)
+    at async E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\dev\next-dev-server.js:373:20
+    at async Span.traceAsyncFn (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\trace\trace.js:153:20)
+    at async DevServer.handleRequest (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\dev\next-dev-server.js:370:24)
+    at async invokeRender (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\lib\router-server.js:183:21)
+    at async handleRequest (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\lib\router-server.js:360:24)
+    at async requestHandlerImpl (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\lib\router-server.js:384:13)
+    at async Server.requestListener (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\lib\start-server.js:142:13)
+ GET /api/exchange/orders 500 in 234ms
+{
+  "type": "INFO",
+  "message": "All WebSocket connections disconnected",
+  "timestamp": "2024-12-13 22:59:08.087"
+}
+{
+  "type": "INFO",
+  "message": "All WebSocket connections disconnected",
+  "timestamp": "2024-12-13 22:59:08.088"
+}
+prisma:query SELECT "public"."ExchangeKey"."id", "public"."ExchangeKey"."userId", "public"."ExchangeKey"."exchange", "public"."ExchangeKey"."name", "public"."ExchangeKey"."apiKey", "public"."ExchangeKey"."apiSecret", "public"."ExchangeKey"."isTestnet", "public"."ExchangeKey"."createdAt", "public"."ExchangeKey"."updatedAt" FROM "public"."ExchangeKey" WHERE ("public"."ExchangeKey"."id") IN (SELECT "t1"."exchangeKeyId" FROM "public"."Bot" AS "t1" WHERE ("t1"."status" = CAST($1::text AS "public"."BotStatus") AND "t1"."exchangeKeyId" IS NOT NULL)) OFFSET $2
+{
+  "type": "INFO",
+  "message": "Adding WebSocket connection",
+  "data": {
+    "connectionId": "binance_testnet_true",
+    "exchange": "binance_testnet",
+    "isTestnet": true
+  },
+  "timestamp": "2024-12-13 22:59:08.092"
+}
+{
+  "type": "INFO",
+  "message": "Attempting WebSocket connection",
+  "data": {
+    "testnet": true,
+    "url": "wss://testnet.binance.vision"
+  },
+  "timestamp": "2024-12-13 22:59:08.094"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket closed, reconnecting...",
+  "timestamp": "2024-12-13 22:59:08.417"
+}
+{
+  "type": "INFO",
+  "message": "Attempting WebSocket connection",
+  "data": {
+    "testnet": true,
+    "url": "wss://testnet.binance.vision"
+  },
+  "timestamp": "2024-12-13 22:59:08.417"
+}
+{
+  "type": "INFO",
+  "message": "Obtained listen key",
+  "data": {
+    "listenKey": "5nrIXRFGkof3gIDDSEk9AiVVsDvNEVtr7VcVzBtwFuRKuAoHsbVFOi2fdMTS"
+  },
+  "timestamp": "2024-12-13 22:59:08.687"
+}
+{
+  "type": "INFO",
+  "message": "Obtained listen key",
+  "data": {
+    "listenKey": "5nrIXRFGkof3gIDDSEk9AiVVsDvNEVtr7VcVzBtwFuRKuAoHsbVFOi2fdMTS"
+  },
+  "timestamp": "2024-12-13 22:59:08.821"
+}
+{
+  "type": "INFO",
+  "message": "New WebSocket connection established",
+  "data": {
+    "connectionId": "binance_testnet_true"
+  },
+  "timestamp": "2024-12-13 22:59:08.823"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket connections initialized successfully",
+  "timestamp": "2024-12-13 22:59:08.823"
+}
+ GET /api/init 200 in 1007ms
+{
+  "type": "INFO",
+  "message": "WebSocket connection opened",
+  "timestamp": "2024-12-13 22:59:09.401"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket connection opened",
+  "timestamp": "2024-12-13 22:59:09.509"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:59:11.371"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:59:31.890"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:59:32.146"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:59:38.961"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:59:39.515"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 22:59:41.373"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:00:01.896"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:00:02.164"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:00:08.954"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:00:09.530"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:00:11.385"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:00:31.946"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:00:32.198"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:00:38.978"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:00:39.540"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:00:41.386"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:01:01.946"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:01:02.218"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:01:08.982"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:01:09.120"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:01:11.390"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:01:32.227"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:01:32.372"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:01:38.983"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:01:39.136"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:01:41.398"
+}
+ GET /dashboard/orders 200 in 26ms
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:02:01.959"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:02:02.243"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:02:09.010"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:02:09.148"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:02:11.412"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:02:31.995"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:02:32.256"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:02:39.000"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:02:39.143"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:02:41.405"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:03:01.956"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:03:02.197"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:03:09.015"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:03:09.154"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:03:11.429"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:03:31.970"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:03:32.197"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:03:39.001"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:03:39.567"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:03:41.852"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:04:01.964"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:04:02.208"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:04:09.004"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:04:09.162"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:04:11.445"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:04:31.984"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:04:32.208"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:04:39.019"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:04:39.154"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:04:41.462"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:05:01.969"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:05:02.218"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:05:09.011"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:05:09.169"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:05:11.466"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:05:32.025"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:05:32.290"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:05:39.040"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:05:39.195"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:05:41.494"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:06:01.996"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:06:02.262"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:06:09.044"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:06:09.192"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:06:11.485"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:06:32.029"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:06:32.286"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:06:39.047"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:06:39.636"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:06:41.484"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:07:02.002"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:07:02.265"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:07:09.056"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:07:09.631"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:07:11.500"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:07:32.049"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:07:32.292"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:07:39.063"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:07:39.643"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:07:41.501"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:08:02.026"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:08:02.279"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:08:09.088"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:08:09.239"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:08:11.514"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:08:32.287"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:08:32.495"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:08:39.069"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:08:39.224"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:08:41.523"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:09:02.023"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:09:02.272"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:09:09.092"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:09:09.254"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:09:11.524"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:09:32.025"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:09:32.273"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:09:39.086"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:09:39.643"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:09:41.527"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:10:02.031"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:10:02.275"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:10:09.093"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:10:09.248"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:10:11.594"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:10:32.059"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:10:32.331"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:10:39.104"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:10:39.679"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:10:41.546"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:11:02.340"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:11:02.484"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:11:09.276"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:11:09.543"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:11:11.557"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:11:32.074"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:11:32.325"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:11:39.101"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:11:39.269"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:11:41.566"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:12:02.059"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:12:02.291"
+}
+prisma:query SELECT "public"."User"."id", "public"."User"."clerkId", "public"."User"."email", "public"."User"."createdAt", "public"."User"."updatedAt" FROM "public"."User" WHERE ("public"."User"."clerkId" = $1 AND 1=1) LIMIT $2 OFFSET $3
+ GET /dashboard/orders 200 in 164ms
+ GET /favicon.ico 200 in 16ms
+=== FETCHING EXCHANGE ORDERS ===
+1. Checking auth...
+Failed to fetch orders: TypeError: (0 , _clerk_nextjs__WEBPACK_IMPORTED_MODULE_3__.auth) is not a function
+    at auth (src\app\api\exchange\orders\route.ts:12:27)
+    at run (webpack://next/dist/src/server/route-modules/app-route/module.ts:529:41)
+    at handler (webpack://next/dist/src/server/route-modules/app-route/module.ts:725:18)
+    at fn (node_modules\next\src\server\lib\trace\tracer.ts:351:27)
+    at NoopContextManager.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NoopTracer.startActiveSpan (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18093)
+    at ProxyTracer.startActiveSpan (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18854)
+    at startActiveSpan (node_modules\next\src\server\lib\trace\tracer.ts:304:31)
+    at NoopContextManager.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at spanContext (node_modules\next\src\server\lib\trace\tracer.ts:303:24)
+    at trace (webpack://next/dist/src/server/route-modules/app-route/module.ts:715:26)
+    at run (webpack://next/dist/src/server/route-modules/app-route/module.ts:662:32)
+    at run (webpack://next/dist/src/server/route-modules/app-route/module.ts:661:34)
+    at run (webpack://next/dist/src/server/route-modules/app-route/module.ts:658:60)
+    at handle (node_modules\next\src\server\base-server.ts:2504:47)
+    at doRender (node_modules\next\src\server\base-server.ts:3027:27)
+    at responseGenerator (node_modules\next\src\server\response-cache\index.ts:67:13)
+    at get (node_modules\next\src\server\base-server.ts:3039:48)
+    at renderToResponseWithComponentsImpl (node_modules\next\src\server\base-server.ts:1877:13)
+    at fn (node_modules\next\src\server\lib\trace\tracer.ts:279:13)
+    at trace (node_modules\next\src\server\base-server.ts:1874:23)
+    at renderToResponseWithComponents (node_modules\next\src\server\base-server.ts:3597:26)
+    at async DevServer.renderToResponseImpl (node_modules\next\src\server\base-server.ts:3659:23)
+    at async DevServer.pipeImpl (node_modules\next\src\server\base-server.ts:1698:20)
+    at async NextNodeServer.handleCatchallRenderRequest (node_modules\next\src\server\next-server.ts:1034:6)
+    at async DevServer.handleRequestImpl (node_modules\next\src\server\base-server.ts:1462:8)
+    at async (node_modules\next\src\server\dev\next-dev-server.ts:514:13)
+    at async Span.traceAsyncFn (node_modules\next\src\trace\trace.ts:143:13)
+    at async DevServer.handleRequest (node_modules\next\src\server\dev\next-dev-server.ts:512:19)
+    at async invokeRender (node_modules\next\src\server\lib\router-server.ts:284:10)
+    at async handleRequest (node_modules\next\src\server\lib\router-server.ts:530:15)
+    at async requestHandlerImpl (node_modules\next\src\server\lib\router-server.ts:576:6)
+    at async Server.requestListener (node_modules\next\src\server\lib\start-server.ts:146:6)
+  10 |     // 1. Check auth
+  11 |     console.log('1. Checking auth...');
+> 12 |     const { userId } = auth();
+     |                           ^
+  13 |     if (!userId) {
+  14 |       throw new Error('Unauthorized');
+  15 |     }
+Error details: TypeError: (0 , _clerk_nextjs__WEBPACK_IMPORTED_MODULE_3__.auth) is not a function
+    at GET (webpack-internal:///(rsc)/./src/app/api/exchange/orders/route.ts:18:79)
+    at AsyncLocalStorage.run (node:async_hooks:335:14)
+    at AppRouteRouteModule.do (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\next-server\app-route.runtime.dev.js:10:33392)
+    at E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\next-server\app-route.runtime.dev.js:10:42828
+    at E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\lib\trace\tracer.js:171:36
+    at NoopContextManager.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NoopTracer.startActiveSpan (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18093)
+    at ProxyTracer.startActiveSpan (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18854)
+    at E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\lib\trace\tracer.js:153:103
+    at NoopContextManager.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NextTracerImpl.trace (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\lib\trace\tracer.js:153:28)
+    at E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\next-server\app-route.runtime.dev.js:10:42689
+    at AsyncLocalStorage.run (node:async_hooks:346:14)
+    at E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\next-server\app-route.runtime.dev.js:10:40501
+    at AsyncLocalStorage.run (node:async_hooks:346:14)
+    at E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\next-server\app-route.runtime.dev.js:10:40458
+    at AsyncLocalStorage.run (node:async_hooks:346:14)
+    at AppRouteRouteModule.handle (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\next-server\app-route.runtime.dev.js:10:40412)
+    at doRender (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\base-server.js:1455:60)
+    at responseGenerator (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\base-server.js:1814:34)
+    at ResponseCache.get (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\response-cache\index.js:49:20)
+    at DevServer.renderToResponseWithComponentsImpl (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\base-server.js:1824:53)
+    at E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\base-server.js:1071:121
+    at NextTracerImpl.trace (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\lib\trace\tracer.js:136:20)
+    at DevServer.renderToResponseWithComponents (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\base-server.js:1071:41)
+    at DevServer.renderPageComponent (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\base-server.js:2240:35)
+    at async DevServer.renderToResponseImpl (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\base-server.js:2278:32)
+    at async DevServer.pipeImpl (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\base-server.js:960:25)
+    at async NextNodeServer.handleCatchallRenderRequest (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\next-server.js:281:17)
+    at async DevServer.handleRequestImpl (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\base-server.js:853:17)
+    at async E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\dev\next-dev-server.js:373:20
+    at async Span.traceAsyncFn (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\trace\trace.js:153:20)
+    at async DevServer.handleRequest (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\dev\next-dev-server.js:370:24)
+    at async invokeRender (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\lib\router-server.js:183:21)
+    at async handleRequest (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\lib\router-server.js:360:24)
+    at async requestHandlerImpl (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\lib\router-server.js:384:13)
+    at async Server.requestListener (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\lib\start-server.js:142:13)
+ GET /api/exchange/orders 500 in 103ms
+{
+  "type": "INFO",
+  "message": "All WebSocket connections disconnected",
+  "timestamp": "2024-12-13 23:12:07.045"
+}
+{
+  "type": "INFO",
+  "message": "All WebSocket connections disconnected",
+  "timestamp": "2024-12-13 23:12:07.045"
+}
+prisma:query SELECT "public"."ExchangeKey"."id", "public"."ExchangeKey"."userId", "public"."ExchangeKey"."exchange", "public"."ExchangeKey"."name", "public"."ExchangeKey"."apiKey", "public"."ExchangeKey"."apiSecret", "public"."ExchangeKey"."isTestnet", "public"."ExchangeKey"."createdAt", "public"."ExchangeKey"."updatedAt" FROM "public"."ExchangeKey" WHERE ("public"."ExchangeKey"."id") IN (SELECT "t1"."exchangeKeyId" FROM "public"."Bot" AS "t1" WHERE ("t1"."status" = CAST($1::text AS "public"."BotStatus") AND "t1"."exchangeKeyId" IS NOT NULL)) OFFSET $2
+{
+  "type": "INFO",
+  "message": "Adding WebSocket connection",
+  "data": {
+    "connectionId": "binance_testnet_true",
+    "exchange": "binance_testnet",
+    "isTestnet": true
+  },
+  "timestamp": "2024-12-13 23:12:07.057"
+}
+{
+  "type": "INFO",
+  "message": "Attempting WebSocket connection",
+  "data": {
+    "testnet": true,
+    "url": "wss://testnet.binance.vision"
+  },
+  "timestamp": "2024-12-13 23:12:07.057"
+}
+{
+  "type": "INFO",
+  "message": "Obtained listen key",
+  "data": {
+    "listenKey": "5nrIXRFGkof3gIDDSEk9AiVVsDvNEVtr7VcVzBtwFuRKuAoHsbVFOi2fdMTS"
+  },
+  "timestamp": "2024-12-13 23:12:07.287"
+}
+{
+  "type": "INFO",
+  "message": "New WebSocket connection established",
+  "data": {
+    "connectionId": "binance_testnet_true"
+  },
+  "timestamp": "2024-12-13 23:12:07.289"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket connections initialized successfully",
+  "timestamp": "2024-12-13 23:12:07.289"
+}
+ GET /api/init 200 in 354ms
+{
+  "type": "INFO",
+  "message": "WebSocket closed, reconnecting...",
+  "timestamp": "2024-12-13 23:12:07.292"
+}
+{
+  "type": "INFO",
+  "message": "Attempting WebSocket connection",
+  "data": {
+    "testnet": true,
+    "url": "wss://testnet.binance.vision"
+  },
+  "timestamp": "2024-12-13 23:12:07.293"
+}
+{
+  "type": "INFO",
+  "message": "Obtained listen key",
+  "data": {
+    "listenKey": "5nrIXRFGkof3gIDDSEk9AiVVsDvNEVtr7VcVzBtwFuRKuAoHsbVFOi2fdMTS"
+  },
+  "timestamp": "2024-12-13 23:12:07.521"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket connection opened",
+  "timestamp": "2024-12-13 23:12:07.955"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket connection opened",
+  "timestamp": "2024-12-13 23:12:08.201"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:12:09.079"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:12:11.563"
+}
+prisma:query SELECT "public"."User"."id", "public"."User"."clerkId", "public"."User"."email", "public"."User"."createdAt", "public"."User"."updatedAt" FROM "public"."User" WHERE ("public"."User"."clerkId" = $1 AND 1=1) LIMIT $2 OFFSET $3
+ GET /dashboard/orders 200 in 142ms
+ GET /favicon.ico 200 in 15ms
+=== FETCHING EXCHANGE ORDERS ===
+1. Checking auth...
+Failed to fetch orders: TypeError: (0 , _clerk_nextjs__WEBPACK_IMPORTED_MODULE_3__.auth) is not a function
+    at auth (src\app\api\exchange\orders\route.ts:12:27)
+    at run (webpack://next/dist/src/server/route-modules/app-route/module.ts:529:41)
+    at handler (webpack://next/dist/src/server/route-modules/app-route/module.ts:725:18)
+    at fn (node_modules\next\src\server\lib\trace\tracer.ts:351:27)
+    at NoopContextManager.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NoopTracer.startActiveSpan (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18093)
+    at ProxyTracer.startActiveSpan (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18854)
+    at startActiveSpan (node_modules\next\src\server\lib\trace\tracer.ts:304:31)
+    at NoopContextManager.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at spanContext (node_modules\next\src\server\lib\trace\tracer.ts:303:24)
+    at trace (webpack://next/dist/src/server/route-modules/app-route/module.ts:715:26)
+    at run (webpack://next/dist/src/server/route-modules/app-route/module.ts:662:32)
+    at run (webpack://next/dist/src/server/route-modules/app-route/module.ts:661:34)
+    at run (webpack://next/dist/src/server/route-modules/app-route/module.ts:658:60)
+    at handle (node_modules\next\src\server\base-server.ts:2504:47)
+    at doRender (node_modules\next\src\server\base-server.ts:3027:27)
+    at responseGenerator (node_modules\next\src\server\response-cache\index.ts:67:13)
+    at get (node_modules\next\src\server\base-server.ts:3039:48)
+    at renderToResponseWithComponentsImpl (node_modules\next\src\server\base-server.ts:1877:13)
+    at fn (node_modules\next\src\server\lib\trace\tracer.ts:279:13)
+    at trace (node_modules\next\src\server\base-server.ts:1874:23)
+    at renderToResponseWithComponents (node_modules\next\src\server\base-server.ts:3597:26)
+    at async DevServer.renderToResponseImpl (node_modules\next\src\server\base-server.ts:3659:23)
+    at async DevServer.pipeImpl (node_modules\next\src\server\base-server.ts:1698:20)
+    at async NextNodeServer.handleCatchallRenderRequest (node_modules\next\src\server\next-server.ts:1034:6)
+    at async DevServer.handleRequestImpl (node_modules\next\src\server\base-server.ts:1462:8)
+    at async (node_modules\next\src\server\dev\next-dev-server.ts:514:13)
+    at async Span.traceAsyncFn (node_modules\next\src\trace\trace.ts:143:13)
+    at async DevServer.handleRequest (node_modules\next\src\server\dev\next-dev-server.ts:512:19)
+    at async invokeRender (node_modules\next\src\server\lib\router-server.ts:284:10)
+    at async handleRequest (node_modules\next\src\server\lib\router-server.ts:530:15)
+    at async requestHandlerImpl (node_modules\next\src\server\lib\router-server.ts:576:6)
+    at async Server.requestListener (node_modules\next\src\server\lib\start-server.ts:146:6)
+  10 |     // 1. Check auth
+  11 |     console.log('1. Checking auth...');
+> 12 |     const { userId } = auth();
+     |                           ^
+  13 |     if (!userId) {
+  14 |       throw new Error('Unauthorized');
+  15 |     }
+Error details: TypeError: (0 , _clerk_nextjs__WEBPACK_IMPORTED_MODULE_3__.auth) is not a function
+    at GET (webpack-internal:///(rsc)/./src/app/api/exchange/orders/route.ts:18:79)
+    at AsyncLocalStorage.run (node:async_hooks:335:14)
+    at AppRouteRouteModule.do (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\next-server\app-route.runtime.dev.js:10:33392)
+    at E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\next-server\app-route.runtime.dev.js:10:42828
+    at E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\lib\trace\tracer.js:171:36
+    at NoopContextManager.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NoopTracer.startActiveSpan (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18093)
+    at ProxyTracer.startActiveSpan (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18854)
+    at E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\lib\trace\tracer.js:153:103
+    at NoopContextManager.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NextTracerImpl.trace (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\lib\trace\tracer.js:153:28)
+    at E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\next-server\app-route.runtime.dev.js:10:42689
+    at AsyncLocalStorage.run (node:async_hooks:346:14)
+    at E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\next-server\app-route.runtime.dev.js:10:40501
+    at AsyncLocalStorage.run (node:async_hooks:346:14)
+    at E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\next-server\app-route.runtime.dev.js:10:40458
+    at AsyncLocalStorage.run (node:async_hooks:346:14)
+    at AppRouteRouteModule.handle (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\compiled\next-server\app-route.runtime.dev.js:10:40412)
+    at doRender (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\base-server.js:1455:60)
+    at responseGenerator (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\base-server.js:1814:34)
+    at ResponseCache.get (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\response-cache\index.js:49:20)
+    at DevServer.renderToResponseWithComponentsImpl (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\base-server.js:1824:53)
+    at E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\base-server.js:1071:121
+    at NextTracerImpl.trace (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\lib\trace\tracer.js:136:20)
+    at DevServer.renderToResponseWithComponents (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\base-server.js:1071:41)
+    at DevServer.renderPageComponent (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\base-server.js:2240:35)
+    at async DevServer.renderToResponseImpl (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\base-server.js:2278:32)
+    at async DevServer.pipeImpl (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\base-server.js:960:25)
+    at async NextNodeServer.handleCatchallRenderRequest (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\next-server.js:281:17)
+    at async DevServer.handleRequestImpl (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\base-server.js:853:17)
+    at async E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\dev\next-dev-server.js:373:20
+    at async Span.traceAsyncFn (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\trace\trace.js:153:20)
+    at async DevServer.handleRequest (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\dev\next-dev-server.js:370:24)
+    at async invokeRender (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\lib\router-server.js:183:21)
+    at async handleRequest (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\lib\router-server.js:360:24)
+    at async requestHandlerImpl (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\lib\router-server.js:384:13)
+    at async Server.requestListener (E:\Sites\CODING\bots-and-chill\node_modules\next\dist\server\lib\start-server.js:142:13)
+ GET /api/exchange/orders 500 in 123ms
+{
+  "type": "INFO",
+  "message": "All WebSocket connections disconnected",
+  "timestamp": "2024-12-13 23:12:19.903"
+}
+{
+  "type": "INFO",
+  "message": "All WebSocket connections disconnected",
+  "timestamp": "2024-12-13 23:12:19.903"
+}
+prisma:query SELECT "public"."ExchangeKey"."id", "public"."ExchangeKey"."userId", "public"."ExchangeKey"."exchange", "public"."ExchangeKey"."name", "public"."ExchangeKey"."apiKey", "public"."ExchangeKey"."apiSecret", "public"."ExchangeKey"."isTestnet", "public"."ExchangeKey"."createdAt", "public"."ExchangeKey"."updatedAt" FROM "public"."ExchangeKey" WHERE ("public"."ExchangeKey"."id") IN (SELECT "t1"."exchangeKeyId" FROM "public"."Bot" AS "t1" WHERE ("t1"."status" = CAST($1::text AS "public"."BotStatus") AND "t1"."exchangeKeyId" IS NOT NULL)) OFFSET $2
+{
+  "type": "INFO",
+  "message": "Adding WebSocket connection",
+  "data": {
+    "connectionId": "binance_testnet_true",
+    "exchange": "binance_testnet",
+    "isTestnet": true
+  },
+  "timestamp": "2024-12-13 23:12:19.911"
+}
+{
+  "type": "INFO",
+  "message": "Attempting WebSocket connection",
+  "data": {
+    "testnet": true,
+    "url": "wss://testnet.binance.vision"
+  },
+  "timestamp": "2024-12-13 23:12:19.912"
+}
+{
+  "type": "INFO",
+  "message": "Obtained listen key",
+  "data": {
+    "listenKey": "5nrIXRFGkof3gIDDSEk9AiVVsDvNEVtr7VcVzBtwFuRKuAoHsbVFOi2fdMTS"
+  },
+  "timestamp": "2024-12-13 23:12:20.177"
+}
+{
+  "type": "INFO",
+  "message": "New WebSocket connection established",
+  "data": {
+    "connectionId": "binance_testnet_true"
+  },
+  "timestamp": "2024-12-13 23:12:20.178"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket connections initialized successfully",
+  "timestamp": "2024-12-13 23:12:20.179"
+}
+ GET /api/init 200 in 299ms
+{
+  "type": "INFO",
+  "message": "WebSocket closed, reconnecting...",
+  "timestamp": "2024-12-13 23:12:20.237"
+}
+{
+  "type": "INFO",
+  "message": "Attempting WebSocket connection",
+  "data": {
+    "testnet": true,
+    "url": "wss://testnet.binance.vision"
+  },
+  "timestamp": "2024-12-13 23:12:20.238"
+}
+{
+  "type": "INFO",
+  "message": "Obtained listen key",
+  "data": {
+    "listenKey": "5nrIXRFGkof3gIDDSEk9AiVVsDvNEVtr7VcVzBtwFuRKuAoHsbVFOi2fdMTS"
+  },
+  "timestamp": "2024-12-13 23:12:20.464"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket connection opened",
+  "timestamp": "2024-12-13 23:12:20.846"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket connection opened",
+  "timestamp": "2024-12-13 23:12:21.151"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:12:32.076"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:12:32.314"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:12:38.226"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:12:39.086"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:12:41.563"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:12:50.453"
+}
+{
+  "type": "INFO",
+  "message": "WebSocket ping successful",
+  "timestamp": "2024-12-13 23:12:50.703"
+}

@@ -22,17 +22,34 @@ export default function OrdersPage() {
     const fetchOrders = async () => {
       try {
         setLoading(true);
+        console.log('Fetching orders from API...');
         const response = await fetch('/api/exchange/orders');
         const result = await response.json();
         
+        console.log('API Response:', result);
+        
         if (result.success && result.data) {
+          const openOrders = (result.data.openOrders || []).map(mapCCXTOrder);
+          const closedOrders = (result.data.closedOrders || []).map(mapCCXTOrder);
+          const allOrders = (result.data.allOrders || []).map(mapCCXTOrder);
+          const trades = (result.data.trades || []).map(mapCCXTTrade);
+
+          console.log('Mapped Data:', {
+            openOrdersCount: openOrders.length,
+            closedOrdersCount: closedOrders.length,
+            allOrdersCount: allOrders.length,
+            tradesCount: trades.length
+          });
+
           setData({
-            openOrders: (result.data.openOrders || []).map(mapCCXTOrder),
-            closedOrders: (result.data.closedOrders || []).map(mapCCXTOrder),
-            allOrders: (result.data.allOrders || []).map(mapCCXTOrder),
-            trades: (result.data.trades || []).map(mapCCXTTrade),
+            openOrders,
+            closedOrders,
+            allOrders,
+            trades,
             rawResponse: result.data.rawResponse
           });
+        } else {
+          console.error('API returned error:', result.error);
         }
       } catch (error) {
         console.error('Failed to fetch orders:', error);

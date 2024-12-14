@@ -1,180 +1,121 @@
 import { NextResponse } from 'next/server';
+import { getExchange } from '@/lib/exchange';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
-import ccxt from 'ccxt';
-import { decrypt } from '@/lib/encryption';
 
-export async function GET(request: Request) {
-  console.log('\n=== FETCHING EXCHANGE ORDERS ===');
+export async function GET() {
   try {
+    console.log('=== FETCHING EXCHANGE ORDERS ===');
+    
+    // 1. Check auth
     console.log('1. Checking auth...');
     const { userId } = await auth();
     if (!userId) {
-      console.log('No userId found');
-      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+      throw new Error('Unauthorized');
     }
-    console.log('Auth OK, userId:', userId);
+    console.log(`Auth OK, userId: ${userId}`);
 
+    // 2. Get exchange key
     console.log('2. Getting exchange key...');
+
+    // First get the User.id from clerkId
+    const user = await prisma.user.findUnique({
+      where: {
+        clerkId: userId
+      },
+      select: {
+        id: true
+      }
+    });
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // Then get the exchange key using the User.id
     const exchangeKey = await prisma.exchangeKey.findFirst({
-      where: { 
-        user: {
-          clerkId: userId
-        },
+      where: {
+        userId: user.id,
         exchange: 'binance_testnet',
         isTestnet: true
-      },
-      include: {
-        user: true
       }
     });
 
     if (!exchangeKey) {
-      console.log('No testnet exchange key found');
-      return NextResponse.json({ success: false, error: 'No testnet exchange keys found' });
+      throw new Error('No exchange key found');
     }
-    console.log('Found testnet exchange key:', exchangeKey.id);
+    console.log(`Found testnet exchange key: ${exchangeKey.id}`);
 
+    // 3. Initialize exchange
     console.log('3. Initializing exchange...');
-    const exchange = new ccxt.binance({
-      apiKey: decrypt(exchangeKey.apiKey),
-      secret: decrypt(exchangeKey.apiSecret),
-      enableRateLimit: true,
+    const exchange = await getExchange(exchangeKey);
+    if (!exchange) {
+      throw new Error('Failed to initialize exchange');
+    }
+
+    // Acknowledge the warning about fetching without symbol
+    exchange.options["warnOnFetchOpenOrdersWithoutSymbol"] = false;
+
+    // Define trading pairs we're interested in
+    const symbols = ['BTC/USDT'];
+    console.log('Exchange initialized\n');
+
+    console.log('4. Fetching orders for symbols:', symbols);
+
+    // Fetch orders for each symbol and combine results
+    const [openOrders, closedOrders, allOrders, trades] = await Promise.all([
+      Promise.all(symbols.map(symbol => exchange.fetchOpenOrders(symbol)))
+        .then(results => results.flat()),
+      Promise.all(symbols.map(symbol => exchange.fetchClosedOrders(symbol)))
+        .then(results => results.flat()),
+      Promise.all(symbols.map(symbol => exchange.fetchOrders(symbol)))
+        .then(results => results.flat()),
+      Promise.all(symbols.map(symbol => exchange.fetchMyTrades(symbol)))
+        .then(results => results.flat())
+    ]);
+
+    console.log('4.1 Trying fetchOpenOrders...');
+    console.log(`Open orders found: ${openOrders.length}`);
+
+    console.log('4.2 Trying fetchClosedOrders...');
+    console.log(`Closed orders found: ${closedOrders.length}`);
+
+    console.log('4.3 Trying fetchOrders...');
+    console.log(`All orders found: ${allOrders.length}`);
+
+    console.log('4.4 Trying fetchMyTrades...');
+    console.log(`Trades found: ${trades.length}`);
+
+    // Log the full response before sending
+    console.log('5. Full response data:', {
+      openOrdersCount: openOrders.length,
+      closedOrdersCount: closedOrders.length,
+      allOrdersCount: allOrders.length,
+      tradesCount: trades.length
     });
 
-    exchange.setSandboxMode(true);
-    console.log('Exchange initialized');
-
-    const symbol = 'BTC/USDT';
-    console.log('\n4. Fetching all possible order/trade info for', symbol);
-
-    const results: Record<string, any> = {};
-    
-    console.log('\n4.1 Trying fetchOpenOrders...');
-    try {
-      results.openOrders = await exchange.fetchOpenOrders(symbol);
-      console.log('Open orders:', JSON.stringify(results.openOrders, null, 2));
-    } catch (error) {
-      const e = error as Error;
-      console.log('Error fetching open orders:', e.message);
-    }
-
-    console.log('\n4.2 Trying fetchClosedOrders...');
-    try {
-      results.closedOrders = await exchange.fetchClosedOrders(symbol);
-      console.log('Closed orders:', JSON.stringify(results.closedOrders, null, 2));
-    } catch (error) {
-      const e = error as Error;
-      console.log('Error fetching closed orders:', e.message);
-    }
-
-    console.log('\n4.3 Trying fetchOrders...');
-    try {
-      results.allOrders = await exchange.fetchOrders(symbol);
-      console.log('All orders:', JSON.stringify(results.allOrders, null, 2));
-    } catch (error) {
-      const e = error as Error;
-      console.log('Error fetching all orders:', e.message);
-    }
-
-    console.log('\n4.4 Trying fetchMyTrades...');
-    try {
-      results.myTrades = await exchange.fetchMyTrades(symbol);
-      console.log('My trades:', JSON.stringify(results.myTrades, null, 2));
-    } catch (error) {
-      const e = error as Error;
-      console.log('Error fetching trades:', e.message);
-    }
-
-    // Check our database for order IDs
-    console.log('\n5. Checking database for saved orders...');
-    const savedOrders = await prisma.deal.findMany({
-      where: {
-        bot: {
-          userId: {
-            equals: exchangeKey.userId
-          },
-          status: 'RUNNING'
-        }
-      },
-      include: {
-        orders: {
-          select: {
-            exchangeOrderId: true,
-            type: true,
-            side: true,
-            status: true,
-            createdAt: true
-          }
-        }
-      }
-    });
-    
-    interface DealOrder {
-      exchangeOrderId: string;
-      type: string;
-      side: string;
-      status: string;
-      createdAt: Date;
-    }
-
-    interface DealWithOrders {
-      orders: DealOrder[];
-    }
-
-    const flattenedOrders = savedOrders.flatMap((deal: DealWithOrders) => deal.orders);
-    console.log('Saved orders in DB:', flattenedOrders);
-
-    if (flattenedOrders.length > 0) {
-      console.log('\n6. Fetching specific orders...');
-      for (const order of flattenedOrders) {
-        try {
-          const orderDetails = await exchange.fetchOrder(order.exchangeOrderId);
-          console.log(`Order ${order.exchangeOrderId} details:`, JSON.stringify(orderDetails, null, 2));
-          results.specificOrders = results.specificOrders || {};
-          results.specificOrders[order.exchangeOrderId] = orderDetails;
-        } catch (error) {
-          const e = error as Error;
-          console.log(`Error fetching order ${order.exchangeOrderId}:`, e.message);
-        }
-      }
-    }
-
-    console.log('\n7. Returning results...');
     return NextResponse.json({
       success: true,
       data: {
-        openOrders: results.openOrders || [],
-        closedOrders: results.closedOrders || [],
-        allOrders: results.allOrders || [],
-        trades: results.myTrades || [],
+        openOrders,
+        closedOrders,
+        allOrders,
+        trades,
         rawResponse: {
-          openOrders: results.openOrders,
-          closedOrders: results.closedOrders,
-          allOrders: results.allOrders,
-          myTrades: results.myTrades
+          openOrders,
+          closedOrders,
+          allOrders,
+          trades
         }
       }
     });
 
   } catch (error) {
-    // Fix error handling
-    let errorMessage = 'Failed to fetch orders';
-    let errorDetails = null;
-
-    if (error instanceof Error) {
-      errorMessage = error.message;
-      errorDetails = error.stack;
-    }
-
-    console.error('\nFailed to fetch orders:', errorMessage);
-    if (errorDetails) {
-      console.error('Stack trace:', errorDetails);
-    }
-
-    return NextResponse.json({ 
-      success: false, 
-      error: errorMessage
-    });
+    console.error('Failed to fetch orders:', error);
+    console.error('Error details:', error.stack);
+    return NextResponse.json({
+      success: false,
+      error: error.message
+    }, { status: 500 });
   }
 } 

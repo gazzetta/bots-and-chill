@@ -11,6 +11,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { placeBaseOrder } from '@/lib/orders/placeBaseOrder';
 
+
 interface OrderUpdate {
   e: 'executionReport';        // Event type
   s: string;                   // Symbol
@@ -54,15 +55,26 @@ interface AccountPosition {
   }>;
 }
 
-const logToFile = (message: string) => {
-  const timestamp = new Date().toISOString();
+
+// WebSocket Logging Configuration
+const WS_LOGGING_ENABLED = true; // Set to true/false to toggle logging
+
+// Logging function that respects the toggle
+const wsLog = (type: 'INFO' | 'ERROR' | 'DEBUG', message: string, data?: any) => {
+  if (!WS_LOGGING_ENABLED) return;
   
-  // Use only our logging system
-  logMessage(LogType.WEBSOCKET, 'WebSocket Event', {
-    timestamp,
-    details: message,
-    raw: true  // Add a flag to identify raw websocket messages
-  });
+  console.log(JSON.stringify({
+    type,
+    message,
+    ...(data && { data }),
+    timestamp: new Date().toISOString().replace('T', ' ').slice(0, -5)
+  }));
+};
+
+// Add this helper function at the top of the file
+const normalizeSymbol = (symbol: string): string => {
+  // Remove all characters except letters and numbers
+  return symbol.replace(/[^A-Z0-9]/g, '');
 };
 
 export class BinanceWebSocket {
@@ -97,7 +109,7 @@ export class BinanceWebSocket {
 
   async connect() {
     try {
-      logMessage(LogType.INFO, 'Attempting WebSocket connection', {
+      wsLog('INFO', 'Attempting WebSocket connection', {
         testnet: this.isTestnet,
         url: this.wsUrl
       });
@@ -114,7 +126,7 @@ export class BinanceWebSocket {
       );
 
       this.listenKey = response.data.listenKey;
-      logMessage(LogType.INFO, 'Obtained listen key', { 
+      wsLog('INFO', 'Obtained listen key', { 
         listenKey: this.listenKey 
       });
 
@@ -124,7 +136,7 @@ export class BinanceWebSocket {
       this.setupWebSocket();
       this.setupPing();
     } catch (error) {
-      logMessage(LogType.ERROR, 'Failed to connect WebSocket', { error });
+      wsLog('ERROR', 'Failed to connect WebSocket', { error });
       throw error;
     }
   }
@@ -133,11 +145,11 @@ export class BinanceWebSocket {
     if (!this.ws) return;
 
     this.ws.on('open', () => {
-      logMessage(LogType.INFO, 'WebSocket connection opened');
+      wsLog('INFO', 'WebSocket connection opened');
     });
 
     this.ws.on('message', async (data: string) => {
-      logMessage(LogType.WEBSOCKET, 'Raw WebSocket message received', {
+      wsLog('INFO', 'Raw WebSocket message received', {
         data: JSON.parse(data)
       });
 
@@ -153,27 +165,26 @@ export class BinanceWebSocket {
             await this.handleAccountUpdate(event);
             break;
           default:
-            logMessage(LogType.INFO, 'Unhandled WebSocket event', { event });
+            wsLog('INFO', 'Unhandled WebSocket event', { event });
         }
       } catch (error) {
-        logMessage(LogType.ERROR, 'WebSocket message handling error', { error, data });
+        wsLog('ERROR', 'WebSocket message handling error', { error, data });
       }
     });
 
     this.ws.on('error', (error) => {
-      logMessage(LogType.ERROR, 'WebSocket error', { error });
+      wsLog('ERROR', 'WebSocket error', { error });
     });
 
     this.ws.on('close', () => {
-      logMessage(LogType.INFO, 'WebSocket closed, reconnecting...');
+      wsLog('INFO', 'WebSocket closed, reconnecting...');
       this.reconnect();
     });
   }
 
   private async handleOrderUpdate(event: OrderUpdate) {
     // Log ALL incoming WebSocket events first
-    logToFile(JSON.stringify({
-      type: 'WebSocket Order Update',
+    wsLog('INFO', 'WebSocket Order Update', {
       executionType: event.x,
       orderStatus: event.X,
       orderType: event.o,
@@ -185,38 +196,41 @@ export class BinanceWebSocket {
       orderId: event.i,
       clientOrderId: event.c,
       transactionTime: new Date(event.T).toISOString()
-    }, null, 2));
+    });
 
     try {
       // Only process TRADE execution types (actual fills)
       if (event.x !== 'TRADE') {
-        logToFile(`Skipping non-TRADE execution type: ${event.x}`);
+        wsLog(`Skipping non-TRADE execution type: ${event.x}`);
         return;
       }
 
       // Skip processing (but we already logged) market orders
       if (event.o === 'MARKET') {
-        logToFile(`Market order received (not processing): ${event.i}`);
+        wsLog(`Market order received (not processing): ${event.i}`);
         return;
       }
 
-      const order = await prisma.order.findFirst({
-        where: { 
-          exchangeOrderId: event.i.toString(),
-          symbol: event.s  // Add symbol to ensure correct order
-        },
-        include: {
-          deal: {
-            include: {
-              bot: true
-            }
-          }
-        }
+      const order = await prisma.$queryRaw`
+        SELECT * FROM "Order" 
+        WHERE "exchangeOrderId" = ${event.i.toString()}
+        AND REGEXP_REPLACE("symbol", '[^A-Z0-9]', '') = ${event.s}
+        LIMIT 1
+      `;
+
+      // Debug logging
+      wsLog('INFO', 'Looking for order', {
+        exchangeOrderId: event.i.toString(),
+        binanceSymbol: event.s,
+        searchPattern: event.s,  // Raw binance symbol
+        dbSymbol: order?.symbol,
+        normalizedDbSymbol: order?.symbol?.replace(/[^A-Z0-9]/g, ''),  // Show how DB symbol is normalized
+        found: !!order
       });
 
       // Skip if order not found (might be a new order being created via CCXT)
       if (!order) {
-        logToFile(`Order not found in DB: ${event.i}`);
+        wsLog(`Order not found in DB: ${event.i}`);
         return;
       }
 
@@ -226,7 +240,7 @@ export class BinanceWebSocket {
       const remaining = parseFloat(event.q) - filled;
 
       // Log detailed order update
-      logMessage(LogType.ORDER_STATUS, 'Processing order update', {
+      wsLog('INFO', 'Processing order update', {
         orderId: order.id,
         exchangeOrderId: event.i,
         oldStatus: order.status,
@@ -270,7 +284,7 @@ export class BinanceWebSocket {
       });
 
     } catch (error) {
-      logMessage(LogType.ERROR, 'Failed to handle order update', {
+      wsLog('ERROR', 'Failed to handle order update', {
         error,
         event
       });
@@ -294,7 +308,7 @@ export class BinanceWebSocket {
     order: any,
     event: OrderUpdate
   ) {
-    logMessage(LogType.INFO, 'Base order filled', {
+    wsLog('INFO', 'Base order filled', {
       dealId: order.deal.id,
       orderId: order.id,
       price: event.L,
@@ -331,7 +345,7 @@ export class BinanceWebSocket {
     order: any,
     event: OrderUpdate
   ) {
-    logMessage(LogType.INFO, 'Safety order filled', {
+    wsLog('INFO', 'Safety order filled', {
       dealId: order.deal.id,
       orderId: order.id,
       price: event.L,
@@ -461,7 +475,7 @@ export class BinanceWebSocket {
   }
 
   private async handleAccountUpdate(event: AccountPosition) {
-    logMessage(LogType.INFO, 'Account update received', {
+    wsLog('INFO', 'Account update received', {
       updateTime: new Date(event.E).toISOString()
     });
     // We don't need to store balances as CCXT is used for new deals
@@ -483,7 +497,7 @@ export class BinanceWebSocket {
       await this.disconnect();
       await this.connect();
     } catch (error) {
-      logMessage(LogType.ERROR, 'Failed to reconnect WebSocket', { error });
+      wsLog('ERROR', 'Failed to reconnect WebSocket', { error });
     }
   }
 
@@ -506,9 +520,9 @@ export class BinanceWebSocket {
             }
           }
         );
-        logMessage(LogType.INFO, 'WebSocket ping successful');
+        wsLog('INFO', 'WebSocket ping successful');
       } catch (error) {
-        logMessage(LogType.ERROR, 'WebSocket ping failed', { error });
+        wsLog('ERROR', 'WebSocket ping failed', { error });
       }
     }, 30000); // Every 30 seconds
   }

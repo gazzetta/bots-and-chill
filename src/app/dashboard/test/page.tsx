@@ -8,11 +8,13 @@ import {
   Stack,
   Paper,
   Alert,
+  TextField,
 } from '@mui/material';
 import { logMessage, LogType } from '@/lib/logging';
 
 export default function TestPage() {
   const [result, setResult] = useState<string>('');
+  const [orderId, setOrderId] = useState<string>('');
 
   const handleTestOrder = async (type: 'MARKET' | 'LIMIT_PO' | 'LIMIT_GTC') => {
     try {
@@ -29,6 +31,19 @@ export default function TestPage() {
 
     } catch (error) {
       console.error('Test failed:', error);
+      setResult(JSON.stringify(error, null, 2));
+    }
+  };
+
+  const handleFetchOrder = async () => {
+    if (!orderId) return;
+    
+    try {
+      const response = await fetch(`/api/test/orders/${orderId}`);
+      const data = await response.json();
+      setResult(JSON.stringify(data, null, 2));
+    } catch (error) {
+      console.error('Fetch order failed:', error);
       setResult(JSON.stringify(error, null, 2));
     }
   };
@@ -59,6 +74,27 @@ export default function TestPage() {
           Test Limit GTC Order
         </Button>
       </Stack>
+
+      <Box sx={{ my: 4 }}>
+        <Typography variant="h6" gutterBottom>
+          Fetch Order by ID
+        </Typography>
+        <Stack direction="row" spacing={2}>
+          <TextField
+            label="Exchange Order ID"
+            value={orderId}
+            onChange={(e) => setOrderId(e.target.value)}
+            size="small"
+          />
+          <Button 
+            variant="contained"
+            onClick={handleFetchOrder}
+            disabled={!orderId}
+          >
+            Fetch Order
+          </Button>
+        </Stack>
+      </Box>
 
       {result && (
         <Paper sx={{ p: 2, bgcolor: 'background.default' }}>

@@ -9,7 +9,7 @@ export async function initializeServices() {
     // Initialize new connections for all running bots
     await wsManager.initializeConnections();
     
-    logMessage(LogType.INFO, 'WebSocket connections initialized successfully');
+    //logMessage(LogType.INFO, 'WebSocket connections initialized successfully');
   } catch (error) {
     logMessage(LogType.ERROR, 'Failed to initialize WebSocket connections', { error });
   }

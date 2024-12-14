@@ -34,7 +34,8 @@ export async function GET(
             price: true,
             filled: true,
             filledAt: true,
-            createdAt: true
+            createdAt: true,
+            exchangeOrderId: true
           }
         }
       }
@@ -56,7 +57,8 @@ export async function GET(
       amount: o.quantity,
       price: o.price,
       status: o.status,
-      filledAt: o.filledAt
+      filledAt: o.filledAt,
+      exchangeOrderId: o.exchangeOrderId
     }));
     const takeProfit = deal.orders.find(o => o.type === 'TAKE_PROFIT');
 

@@ -291,19 +291,41 @@ export default function BotDetailsPage() {
     );
   };
 
-  const updateStageFromResponse = (data: any) => {
-    console.log('Updating stages with data:', data);
-
-    // Base Order
-    if (data.success && data.stages?.stage1) {
-      updateStage('Base Order', 'success', 'Market order placed');
-      updateStage('Take Profit Order', 'success', 'Take profit order placed');
-      updateStage('Safety Orders', 'success', `${bot?.maxSafetyOrders} orders placed`);
+  const updateStageFromResponse = (response: any) => {
+    const newStages = [...orderStages];
+    
+    if (response.success) {
+      // Base order placed successfully
+      if (response.deal) {
+        newStages[0] = { 
+          name: 'Base Order',
+          status: 'success'
+        };
+        
+        // Safety orders placed
+        if (response.deal.orders?.some(o => o.type === 'SAFETY')) {
+          newStages[2] = {
+            name: 'Safety Orders',
+            status: 'success'
+          };
+        }
+        
+        // Take profit order placed
+        if (response.deal.orders?.some(o => o.type === 'TAKE_PROFIT')) {
+          newStages[1] = {
+            name: 'Take Profit Order', 
+            status: 'success'
+          };
+        }
+      }
     } else {
-      updateStage('Base Order', 'failed', data.error || 'Failed to create orders');
-      updateStage('Take Profit Order', 'failed');
-      updateStage('Safety Orders', 'failed');
+      // If there's an error, mark all stages as failed
+      newStages.forEach(stage => {
+        stage.status = 'failed';
+      });
     }
+    
+    setOrderStages(newStages);
   };
 
   const startDeal = async () => {
