@@ -4,14 +4,173 @@ import { prisma } from '@/lib/prisma';
 import { Exchange } from 'ccxt';
 import { decrypt } from '@/lib/encryption';
 import { OrderStatus, DealStatus, OrderType, Deal, Order, Bot, TradingPair, ExchangeKey, OrderSide, OrderMethod } from '@prisma/client';
-import { calculateTakeProfitPrice } from '@/lib/exchange/orders';
 import { logMessage, LogType } from '@/lib/logging';
 import { createOrders } from '@/lib/orders/createOrders';
-import { placeBaseOrder } from '@/lib/orders/placeBaseOrder';
 import ccxt from 'ccxt';
 
 const DEV_MODE = process.env.DEV_MODE_MANUAL_CHECKER;
+const API_HOST = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:3002';
 
+// Helper functions
+async function startNewDeal(deal: DealWithRelations, exchange: Exchange, debugActions: DebugAction[]) {
+  if (!DEV_MODE) {
+    try {
+      // Get auth token from the current request
+      const authData = await auth();
+      const token = await authData.getToken();
+
+      // Use the existing bot orders endpoint with full URL and auth
+      const response = await fetch(`${API_HOST}/api/bots/${deal.bot.id}/orders`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to start new deal');
+      }
+
+      const result = await response.json();
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to start new deal');
+      }
+
+      debugActions.push({
+        type: 'INFO',
+        description: 'Started new deal via bot orders endpoint',
+        details: {
+          newDealId: result.deal.id,
+          status: result.deal.status
+        }
+      });
+    } catch (error) {
+      debugActions.push({
+        type: 'ERROR',
+        description: 'Failed to start new deal',
+        details: {
+          error: error instanceof Error ? error.message : 'Unknown error'
+        }
+      });
+      throw error;
+    }
+  } else {
+    // In DEV_MODE, just show what would happen
+    const ticker = await exchange.fetchTicker(deal.bot.pair.symbol);
+    const orders = createOrders({
+      bot: deal.bot,
+      pair: deal.bot.pair,
+      symbol: deal.bot.pair.symbol,
+      currentPrice: ticker.bid
+    });
+
+    debugActions.push({
+      type: 'SQL_CREATE',
+      description: 'Would create new deal',
+      details: {
+        botId: deal.bot.id,
+        status: DealStatus.PENDING
+      }
+    });
+
+    debugActions.push({
+      type: 'CCXT_ORDER',
+      description: 'Would place base market buy order',
+      details: {
+        symbol: orders.stage1.symbol,
+        amount: orders.stage1.amount
+      }
+    });
+
+    // Show what SO and TP orders would be placed
+    orders.stage2.safetyOrders.forEach((so, index) => {
+      debugActions.push({
+        type: 'CCXT_ORDER',
+        description: `Would place SO ${index + 1}`,
+        details: {
+          symbol: so.symbol,
+          type: 'limit',
+          side: 'buy',
+          amount: so.amount,
+          price: so.price,
+          params: { timeInForce: 'PO', postOnly: true }
+        }
+      });
+    });
+
+    debugActions.push({
+      type: 'CCXT_ORDER',
+      description: 'Would place TP order',
+      details: {
+        symbol: orders.stage2.takeProfit.symbol,
+        type: 'limit',
+        side: 'sell',
+        amount: orders.stage1.amount,
+        price: orders.stage2.takeProfit.price,
+        params: { timeInForce: 'PO', postOnly: true }
+      }
+    });
+  }
+}
+
+async function completeDeal(deal: DealWithRelations, debugActions: DebugAction[]) {
+  const now = new Date();
+  
+  if (!DEV_MODE) {
+    await prisma.deal.update({
+      where: { id: deal.id },
+      data: {
+        status: DealStatus.COMPLETED,
+        currentQuantity: 0,
+        updatedAt: now,
+        closedAt: now
+      }
+    });
+  }
+
+  debugActions.push({
+    type: 'SQL_UPDATE',
+    description: 'Would mark deal as completed',
+    details: {
+      dealId: deal.id,
+      updates: {
+        status: DealStatus.COMPLETED,
+        currentQuantity: 0,
+        updatedAt: now,
+        closedAt: now
+      }
+    }
+  });
+}
+
+async function updateDealTotals(deal: DealWithRelations, totalQuantity: number, totalCost: number, debugActions: DebugAction[]) {
+  const averagePrice = totalCost / totalQuantity;
+
+  if (!DEV_MODE) {
+    await prisma.deal.update({
+      where: { id: deal.id },
+      data: {
+        currentQuantity: Number(totalQuantity),
+        totalCost: Number(totalCost),
+        averagePrice: Number(averagePrice)
+      }
+    });
+  }
+
+  debugActions.push({
+    type: 'SQL_UPDATE',
+    description: 'Would update deal totals',
+    details: {
+      dealId: deal.id,
+      updates: {
+        currentQuantity: Number(totalQuantity).toFixed(8),
+        totalCost: Number(totalCost).toFixed(8),
+        averagePrice: Number(averagePrice).toFixed(8)
+      }
+    }
+  });
+}
 
 interface DealWithRelations extends Deal {
   bot: Bot & {
@@ -27,412 +186,476 @@ interface ExchangeOrder {
   filled: number;
   price: number;
   lastTradeTimestamp: number;
+  amount: number;
 }
 
 interface DebugAction {
-  type: 'SQL_UPDATE' | 'SQL_CREATE' | 'CCXT_ORDER' | 'CCXT_CANCEL';
+  type: 'SQL_UPDATE' | 'SQL_CREATE' | 'CCXT_ORDER' | 'CCXT_CANCEL' | 'INFO' | 'ERROR';
   description: string;
-  details: any;
+  details: Record<string, unknown>;
 }
 
-async function failedWebsocketDealChecker(deal: DealWithRelations, exchange: Exchange) {
-  const debugActions: DebugAction[] = [];
-  try {
-  
-  
-    // 1. First check TP status
-    const tpOrder = deal.orders.find(o => o.type === OrderType.TAKE_PROFIT);
-    let tpFilledIRL = false;
-    
-    if (tpOrder) {
-      const tpStatus = await exchange.fetchOrder(tpOrder.exchangeOrderId, deal.bot.pair.symbol) as ExchangeOrder;
-      tpFilledIRL = tpStatus.status === 'closed';
-      
-      debugActions.push({
-        type: 'CCXT_ORDER',
-        description: 'Checked TP order status',
-        details: { orderId: tpOrder.exchangeOrderId, status: tpStatus.status }
-      });
+async function calculateTakeProfitPrice(averagePrice: number, takeProfit: number): Promise<number> {
+  return averagePrice * (1 + takeProfit / 100);
+}
 
-      // If TP is filled, update it in DB
-      if (tpFilledIRL && tpOrder.status !== OrderStatus.FILLED) {
-        debugActions.push({
-          type: 'SQL_UPDATE',
-          description: 'Would update TP order as filled',
-          details: {
-            orderId: tpOrder.id,
-            updates: {
-              status: OrderStatus.FILLED,
-              filled: tpStatus.filled,
-              remaining: 0,
-              filledAt: new Date(tpStatus.lastTradeTimestamp),
-              cost: tpStatus.filled * tpStatus.price
-            }
-          }
-        });
+async function handleState1(deal: DealWithRelations, exchange: Exchange, debugActions: DebugAction[]) {
+  // State 1: SOs filled + TP filled
+  const unfilledSOs = deal.orders.filter(o => 
+    o.type === OrderType.SAFETY && o.status !== OrderStatus.FILLED
+  );
 
-        if (!DEV_MODE) {
-          await prisma.order.update({
-            where: { id: tpOrder.id },
-            data: {
-              status: OrderStatus.FILLED,
-              filled: tpStatus.filled,
-              remaining: 0,
-              filledAt: new Date(tpStatus.lastTradeTimestamp),
-              cost: tpStatus.filled * tpStatus.price
-            }
-          });
-        }
+  let totalQuantity = Number(deal.currentQuantity);
+  let totalCost = Number(deal.totalCost);
+  let newlyFilledSOQuantity = 0;
+  let newlyFilledSOCost = 0;
+
+  // First process filled SOs
+  for (const so of unfilledSOs) {
+    const orderStatus = await exchange.fetchOrder(so.exchangeOrderId, deal.bot.pair.symbol) as ExchangeOrder;
+    debugActions.push({
+      type: 'CCXT_ORDER',
+      description: 'Checked SO order status',
+      details: { 
+        orderId: so.exchangeOrderId, 
+        status: orderStatus.status,
+        filled: orderStatus.filled,
+        price: orderStatus.price
       }
-    }
+    });
 
-    // 2. Check unfilled SO orders
-    const unfilledSOs = deal.orders.filter(o => 
-      o.type === OrderType.SAFETY && o.status !== OrderStatus.FILLED
-    );
-
-    let totalQuantity = deal.currentQuantity;
-    let totalCost = deal.totalCost;
-    let needNewTP = false;
-
-    // Process each unfilled SO
-    for (const so of unfilledSOs) {
-      const orderStatus = await exchange.fetchOrder(so.exchangeOrderId, deal.bot.pair.symbol) as ExchangeOrder;
-      debugActions.push({
-        type: 'CCXT_ORDER',
-        description: 'Checked SO order status',
-        details: { orderId: so.exchangeOrderId, status: orderStatus.status }
-      });
-      
-      if (orderStatus.status === 'closed') {
-        debugActions.push({
-          type: 'SQL_UPDATE',
-          description: 'Would update SO order as filled',
-          details: {
-            orderId: so.id,
-            updates: {
-              status: OrderStatus.FILLED,
-              filled: orderStatus.filled,
-              remaining: 0,
-              filledAt: new Date(orderStatus.lastTradeTimestamp),
-              cost: orderStatus.filled * orderStatus.price
-            }
-          }
-        });
-
-        if (!DEV_MODE) {
-          await prisma.order.update({
-            where: { id: so.id },
-            data: {
-              status: OrderStatus.FILLED,
-              filled: orderStatus.filled,
-              remaining: 0,
-              filledAt: new Date(orderStatus.lastTradeTimestamp),
-              cost: orderStatus.filled * orderStatus.price
-            }
-          });
-        }
-
-        totalQuantity = totalQuantity.plus(orderStatus.filled);
-        totalCost = totalCost.plus(orderStatus.filled * orderStatus.price);
-        needNewTP = true;
-      }
-    }
-
-    // 3. Handle TP updates if needed
-    if (needNewTP && !tpFilledIRL) {
-      if (tpOrder) {
-        debugActions.push({
-          type: 'CCXT_CANCEL',
-          description: 'Would cancel old TP order',
-          details: { orderId: tpOrder.exchangeOrderId }
-        });
-
-        if (!DEV_MODE) {
-          await exchange.cancelOrder(tpOrder.exchangeOrderId, deal.bot.pair.symbol);
-          
-          // Add the missing DB update for cancelled TP
-          await prisma.order.update({
-            where: { id: tpOrder.id },
-            data: {
-              status: OrderStatus.CANCELLED,
-              remaining: 0,
-              updatedAt: new Date()
-            }
-          });
-
-          debugActions.push({
-            type: 'SQL_UPDATE',
-            description: 'Updated cancelled TP order in DB',
-            details: {
-              orderId: tpOrder.id,
-              updates: {
-                status: OrderStatus.CANCELLED,
-                remaining: 0,
-                updatedAt: new Date()
-              }
-            }
-          });
-        }
-      }
-
-      const averagePrice = totalCost.toNumber() / totalQuantity.toNumber()  ;
-      const newTPPrice = calculateTakeProfitPrice(averagePrice, deal.bot.takeProfit.toNumber());
-
-      debugActions.push({
-        type: 'CCXT_ORDER',
-        description: 'Would place new TP order',
-        details: {
-          symbol: deal.bot.pair.symbol,
-          type: 'limit',
-          side: 'sell',
-          amount: totalQuantity,
-          price: newTPPrice,
-          params: { timeInForce: 'PO', postOnly: true }
-        }
-      });
+    if (orderStatus.status === 'closed') {
+      // Track newly discovered filled SOs
+      newlyFilledSOQuantity += Number(orderStatus.filled);
+      newlyFilledSOCost += Number(orderStatus.filled) * Number(orderStatus.price);
 
       if (!DEV_MODE) {
-        try {
-          if (tpOrder) {
-            await exchange.cancelOrder(tpOrder.exchangeOrderId, deal.bot.pair.symbol);
+        await prisma.order.update({
+          where: { id: so.id },
+          data: {
+            status: OrderStatus.FILLED,
+            filled: orderStatus.filled,
+            remaining: 0,
+            filledAt: new Date(orderStatus.lastTradeTimestamp),
+            cost: orderStatus.filled * orderStatus.price
           }
-
-          const newTP = await exchange.createOrder(
-            deal.bot.pair.symbol,
-            'limit',
-            'sell',
-            totalQuantity.toNumber(),
-            newTPPrice,
-            { timeInForce: 'PO', postOnly: true }
-          ) as ExchangeOrder;
-
-          debugActions.push({
-            type: 'SQL_CREATE',
-            description: 'Would create new TP order in DB',
-            details: {
-              dealId: deal.id,
-              type: OrderType.TAKE_PROFIT,
-              side: 'SELL',
-              status: OrderStatus.PLACED,
-              symbol: deal.bot.pair.symbol,
-              quantity: totalQuantity,
-              price: newTPPrice,
-              exchangeOrderId: newTP.id
-            }
-          });
-        } catch (error) {
-          if (error instanceof Error && error.name === 'OrderImmediatelyFillable') {
-            debugActions.push({
-              type: 'CCXT_ORDER',
-              description: 'Would place market sell order (TP price below market)',
-              details: {
-                symbol: deal.bot.pair.symbol,
-                type: 'market',
-                side: 'sell',
-                amount: totalQuantity
-              }
-            });
-
-            debugActions.push({
-              type: 'SQL_UPDATE',
-              description: 'Would mark deal as completed',
-              details: {
-                dealId: deal.id,
-                updates: {
-                  status: DealStatus.COMPLETED,
-                  currentQuantity: 0,
-                  updatedAt: new Date()
-                }
-              }
-            });
-          }
-        }
+        });
       }
-    }
-
-    // 4. Update deal totals if needed
-    if (needNewTP) {
-      const filledOrders = deal.orders.filter(o => o.status === OrderStatus.FILLED);
-      const totalQuantity = filledOrders.reduce((sum, order) => {
-        return sum + Number(order.filled);
-      }, 0);
-
-      const totalCost = filledOrders.reduce((sum, order) => {
-        return sum + (Number(order.filled) * Number(order.price));
-      }, 0);
-
-      const averagePrice = totalCost / totalQuantity;
-
       debugActions.push({
         type: 'SQL_UPDATE',
-        description: 'Would update deal totals',
+        description: 'Would update SO as filled',
         details: {
-          dealId: deal.id,
-          updates: {
-            currentQuantity: totalQuantity,
-            totalCost: totalCost,
-            averagePrice: averagePrice
-          }
+          orderId: so.id,
+          status: OrderStatus.FILLED,
+          filled: orderStatus.filled,
+          cost: orderStatus.filled * orderStatus.price
         }
       });
-
-      if (!DEV_MODE) {
-        await prisma.deal.update({
-          where: { id: deal.id },
-          data: {
-            currentQuantity: totalQuantity,
-            totalCost: totalCost,
-            averagePrice: averagePrice
-          }
-        });
-      }
-    }
-
-    if (tpFilledIRL) {
+      totalQuantity = Number(totalQuantity) + Number(orderStatus.filled);
+      totalCost = Number(totalCost) + (Number(orderStatus.filled) * Number(orderStatus.price));
+    } else {
+      // Cancel unfilled SOs
       debugActions.push({
-        type: 'SQL_UPDATE',
-        description: 'Would mark current deal as completed',
-        details: {
-          dealId: deal.id,
-          status: DealStatus.COMPLETED
-        }
+        type: 'CCXT_CANCEL',
+        description: 'Would cancel unfilled SO',
+        details: { orderId: so.exchangeOrderId }
       });
 
       if (!DEV_MODE) {
-        // Mark current deal as completed
-        await prisma.deal.update({
-          where: { id: deal.id },
+        await exchange.cancelOrder(so.exchangeOrderId, deal.bot.pair.symbol);
+        await prisma.order.update({
+          where: { id: so.id },
           data: {
-            status: DealStatus.COMPLETED,
-            currentQuantity: 0,
+            status: OrderStatus.CANCELLED,
+            remaining: 0,
             updatedAt: new Date()
           }
         });
+      }
+    }
+  }
 
-        // Start new deal
-        const ticker = await exchange.fetchTicker(deal.bot.pair.symbol);
-        const newDeal = await prisma.deal.create({
-          data: {
-            botId: deal.bot.id,
-            status: DealStatus.PENDING,
-            currentQuantity: 0,
-            averagePrice: 0,
-            totalCost: 0,
-            currentProfit: 0
-          }
-        });
+  // Update deal totals with proper number formatting
+  debugActions.push({
+    type: 'INFO',
+    description: 'Current totals before update',
+    details: {
+      totalQuantity,
+      totalCost,
+      averagePrice: totalCost / totalQuantity,
+      newlyFilledSOQuantity,
+      newlyFilledSOCost
+    }
+  });
 
-        // Use createOrders to generate order parameters
-        const orders = createOrders({
-          bot: deal.bot,
-          pair: deal.bot.pair,
-          symbol: deal.bot.pair.symbol,
-          currentPrice: ticker.bid
-        });
+  await updateDealTotals(deal, totalQuantity, totalCost, debugActions);
 
-        // Place and save base order
-        const baseOrder = await exchange.createMarketBuyOrder(
-          orders.stage1.symbol,
-          orders.stage1.amount
-        );
-
-        await prisma.order.create({
-          data: {
-            dealId: newDeal.id,
-            type: OrderType.BASE,
-            side: OrderSide.BUY,
-            method: OrderMethod.MARKET,
-            status: OrderStatus.FILLED,
-            symbol: deal.bot.pair.symbol,
-            quantity: Number(baseOrder.amount),
-            price: Number(baseOrder.price),
-            filled: Number(baseOrder.amount),
-            remaining: 0,
-            cost: Number(baseOrder.cost),
-            exchangeOrderId: baseOrder.id,
-            filledAt: new Date()
-          }
-        });
-
-        // After placing base order for new deal...
-        const stage2Orders = createOrders({
-          bot: deal.bot,
-          pair: deal.bot.pair,
-          symbol: deal.bot.pair.symbol,
-          currentPrice: ticker.bid,
-          fillPrice: baseOrder.price
-        }).stage2;
-
-        // Place safety orders
-        for (const so of stage2Orders.safetyOrders) {
-          const safetyOrder = await exchange.createLimitBuyOrder(
-            so.symbol,
-            so.amount,
-            so.price,
-            so.params
-          );
-          await prisma.order.create({
-            data: {
-              dealId: newDeal.id,
-              type: OrderType.SAFETY,
-              side: OrderSide.BUY,
-              method: OrderMethod.LIMIT,
-              status: OrderStatus.PLACED,
-              symbol: deal.bot.pair.symbol,
-              quantity: Number(so.amount),
-              price: Number(so.price),
-              filled: 0,
-              remaining: Number(so.amount),
-              cost: 0,
-              exchangeOrderId: safetyOrder.id
-            }
-          });
+  // Process TP
+  const tpOrder = deal.orders.find(o => o.type === OrderType.TAKE_PROFIT);
+  if (tpOrder) {
+    const tpStatus = await exchange.fetchOrder(tpOrder.exchangeOrderId, deal.bot.pair.symbol) as ExchangeOrder;
+    if (!DEV_MODE) {
+      await prisma.order.update({
+        where: { id: tpOrder.id },
+        data: {
+          status: OrderStatus.FILLED,
+          filled: tpStatus.filled,
+          remaining: 0,
+          filledAt: new Date(tpStatus.lastTradeTimestamp),
+          cost: tpStatus.filled * tpStatus.price
         }
+      });
+    }
+    debugActions.push({
+      type: 'SQL_UPDATE',
+      description: 'Would update TP as filled',
+      details: {
+        orderId: tpOrder.id,
+        status: OrderStatus.FILLED,
+        filled: tpStatus.filled,
+        cost: tpStatus.filled * tpStatus.price
+      }
+    });
+  }
 
-        // Place take profit
-        const tp = stage2Orders.takeProfit;
-        const takeProfitOrder = await exchange.createLimitSellOrder(
-          tp.symbol,
-          baseOrder.amount,
-          tp.price,
-          tp.params
-        );
+  // Complete deal with warning if needed
+  if (newlyFilledSOQuantity > 0) {
+    const warningMessage = `You still have ${newlyFilledSOQuantity.toFixed(8)} ${deal.bot.pair.symbol.split('/')[0]} that you purchased via Safety Orders at an average price of ${(newlyFilledSOCost / newlyFilledSOQuantity).toFixed(8)} that has not been sold due to the deal closing abnormally. You may wish to sell them to replenish your quote currency (${deal.bot.pair.symbol.split('/')[1]}).`;
+    
+    if (!DEV_MODE) {
+      await prisma.deal.update({
+        where: { id: deal.id },
+        data: {
+          warningMessage
+        }
+      });
+    }
+    
+    debugActions.push({
+      type: 'INFO',
+      description: 'Added warning about unsold coins',
+      details: { warningMessage }
+    });
+  }
+
+  await completeDeal(deal, debugActions);
+  await startNewDeal(deal, exchange, debugActions);
+}
+
+async function handleState2(deal: DealWithRelations, exchange: Exchange, debugActions: DebugAction[]) {
+  // State 2: SOs filled + TP not filled
+  const unfilledSOs = deal.orders.filter(o => 
+    o.type === OrderType.SAFETY && o.status !== OrderStatus.FILLED
+  );
+
+  let totalQuantity = Number(deal.currentQuantity);
+  let totalCost = Number(deal.totalCost);
+
+  // Process filled SOs
+  for (const so of unfilledSOs) {
+    const orderStatus = await exchange.fetchOrder(so.exchangeOrderId, deal.bot.pair.symbol) as ExchangeOrder;
+    debugActions.push({
+      type: 'CCXT_ORDER',
+      description: 'Checked SO order status',
+      details: { 
+        orderId: so.exchangeOrderId, 
+        status: orderStatus.status,
+        filled: orderStatus.filled,
+        price: orderStatus.price
+      }
+    });
+
+    if (orderStatus.status === 'closed') {
+      if (!DEV_MODE) {
+        await prisma.order.update({
+          where: { id: so.id },
+          data: {
+            status: OrderStatus.FILLED,
+            filled: orderStatus.filled,
+            remaining: 0,
+            filledAt: new Date(orderStatus.lastTradeTimestamp),
+            cost: orderStatus.filled * orderStatus.price
+          }
+        });
+      }
+      debugActions.push({
+        type: 'SQL_UPDATE',
+        description: 'Would update SO as filled',
+        details: {
+          orderId: so.id,
+          status: OrderStatus.FILLED,
+          filled: orderStatus.filled,
+          cost: orderStatus.filled * orderStatus.price
+        }
+      });
+      totalQuantity = Number(totalQuantity) + Number(orderStatus.filled);
+      totalCost = Number(totalCost) + (Number(orderStatus.filled) * Number(orderStatus.price));
+    }
+  }
+
+  // Update deal totals
+  await updateDealTotals(deal, totalQuantity, totalCost, debugActions);
+
+  // Update TP
+  const tpOrder = deal.orders.find(o => o.type === OrderType.TAKE_PROFIT);
+  if (tpOrder) {
+    debugActions.push({
+      type: 'CCXT_CANCEL',
+      description: 'Would cancel current TP order',
+      details: { orderId: tpOrder.exchangeOrderId }
+    });
+
+    // Cancel old TP
+    if (!DEV_MODE) {
+      await exchange.cancelOrder(tpOrder.exchangeOrderId, deal.bot.pair.symbol);
+      await prisma.order.update({
+        where: { id: tpOrder.id },
+        data: {
+          status: OrderStatus.CANCELLED,
+          remaining: 0,
+          updatedAt: new Date()
+        }
+      });
+    }
+
+    // Calculate and place new TP
+    const averagePrice = Number(totalCost) / Number(totalQuantity);
+    const newTPPrice = await calculateTakeProfitPrice(averagePrice, Number(deal.bot.takeProfit));
+
+    debugActions.push({
+      type: 'CCXT_ORDER',
+      description: 'Would place new TP order',
+      details: {
+        symbol: deal.bot.pair.symbol,
+        type: 'limit',
+        side: 'sell',
+        amount: Number(totalQuantity),
+        price: newTPPrice,
+        params: { timeInForce: 'PO', postOnly: true }
+      }
+    });
+
+    try {
+      const newTP = !DEV_MODE ? await exchange.createOrder(
+        deal.bot.pair.symbol,
+        'limit',
+        'sell',
+        Number(totalQuantity),
+        newTPPrice,
+        { timeInForce: 'PO', postOnly: true }
+      ) as ExchangeOrder : null;
+
+      if (!DEV_MODE && newTP) {
         await prisma.order.create({
           data: {
-            dealId: newDeal.id,
+            dealId: deal.id,
             type: OrderType.TAKE_PROFIT,
             side: OrderSide.SELL,
             method: OrderMethod.LIMIT,
             status: OrderStatus.PLACED,
             symbol: deal.bot.pair.symbol,
-            quantity: Number(baseOrder.amount),
-            price: Number(tp.price),
+            quantity: Number(totalQuantity),
+            price: newTPPrice,
             filled: 0,
-            remaining: Number(baseOrder.amount),
+            remaining: Number(totalQuantity),
             cost: 0,
-            exchangeOrderId: takeProfitOrder.id
-          }
-        });
-
-        // Update deal status to ACTIVE
-        await prisma.deal.update({
-          where: { id: newDeal.id },
-          data: {
-            status: DealStatus.ACTIVE,
-            currentQuantity: baseOrder.amount,
-            averagePrice: baseOrder.price,
-            totalCost: baseOrder.cost
+            exchangeOrderId: newTP.id
           }
         });
       }
+    } catch (error) {
+      if (error instanceof Error && error.name === 'OrderImmediatelyFillable') {
+        debugActions.push({
+          type: 'CCXT_ORDER',
+          description: 'Would place market sell order (TP price below market)',
+          details: {
+            symbol: deal.bot.pair.symbol,
+            type: 'market',
+            side: 'sell',
+            amount: Number(totalQuantity)
+          }
+        });
+
+        // Place market sell order instead
+        const marketTP = !DEV_MODE ? await exchange.createMarketOrder(
+          deal.bot.pair.symbol,
+          'sell',
+          Number(totalQuantity)
+        ) as ExchangeOrder : null;
+
+        if (!DEV_MODE && marketTP) {
+          await prisma.order.create({
+            data: {
+              dealId: deal.id,
+              type: OrderType.TAKE_PROFIT,
+              side: OrderSide.SELL,
+              method: OrderMethod.MARKET,
+              status: OrderStatus.FILLED,
+              symbol: deal.bot.pair.symbol,
+              quantity: Number(marketTP.amount),
+              price: Number(marketTP.price),
+              filled: Number(marketTP.amount),
+              remaining: 0,
+              cost: Number(marketTP.amount) * Number(marketTP.price),
+              exchangeOrderId: marketTP.id,
+              filledAt: new Date(marketTP.lastTradeTimestamp || Date.now())
+            }
+          });
+
+          // Complete this deal and start new one
+          await completeDeal(deal, debugActions);
+          await startNewDeal(deal, exchange, debugActions);
+        }
+      }
+    }
+  }
+}
+
+async function handleState3(deal: DealWithRelations, exchange: Exchange, debugActions: DebugAction[]) {
+  // State 3: No SOs filled + TP filled
+  const unfilledSOs = deal.orders.filter(o => 
+    o.type === OrderType.SAFETY && o.status !== OrderStatus.FILLED
+  );
+
+  // Cancel all unfilled SOs
+  for (const so of unfilledSOs) {
+    debugActions.push({
+      type: 'CCXT_CANCEL',
+      description: 'Would cancel unfilled SO',
+      details: { orderId: so.exchangeOrderId }
+    });
+
+    if (!DEV_MODE) {
+      await exchange.cancelOrder(so.exchangeOrderId, deal.bot.pair.symbol);
+      await prisma.order.update({
+        where: { id: so.id },
+        data: {
+          status: OrderStatus.CANCELLED,
+          remaining: 0,
+          updatedAt: new Date()
+        }
+      });
+    }
+  }
+
+  // Process TP
+  const tpOrder = deal.orders.find(o => o.type === OrderType.TAKE_PROFIT);
+  if (tpOrder) {
+    const tpStatus = await exchange.fetchOrder(tpOrder.exchangeOrderId, deal.bot.pair.symbol) as ExchangeOrder;
+    debugActions.push({
+      type: 'SQL_UPDATE',
+      description: 'Would update TP as filled',
+      details: {
+        orderId: tpOrder.id,
+        status: OrderStatus.FILLED,
+        filled: tpStatus.filled,
+        cost: tpStatus.filled * tpStatus.price
+      }
+    });
+
+    if (!DEV_MODE) {
+      await prisma.order.update({
+        where: { id: tpOrder.id },
+        data: {
+          status: OrderStatus.FILLED,
+          filled: tpStatus.filled,
+          remaining: 0,
+          filledAt: new Date(tpStatus.lastTradeTimestamp),
+          cost: tpStatus.filled * tpStatus.price
+        }
+      });
+    }
+  }
+
+  // Complete deal and start new one
+  await completeDeal(deal, debugActions);
+  await startNewDeal(deal, exchange, debugActions);
+}
+
+async function failedWebsocketDealChecker(deal: DealWithRelations, exchange: Exchange) {
+  const debugActions: DebugAction[] = [];
+  try {
+    // First gather all order statuses
+    const tpOrder = deal.orders.find(o => o.type === OrderType.TAKE_PROFIT);
+    let tpFilledIRL = false;
+    let tpStatus: ExchangeOrder | null = null;
+    
+    // Check TP status first
+    if (tpOrder) {
+      tpStatus = await exchange.fetchOrder(tpOrder.exchangeOrderId, deal.bot.pair.symbol) as ExchangeOrder;
+      if (tpStatus.status === 'canceled') {
+        if (!DEV_MODE) {
+          await prisma.deal.update({
+            where: { id: deal.id },
+            data: { status: DealStatus.FAILED }
+          });
+        }
+        return DEV_MODE ? { 
+          success: true, 
+          updated: false,
+          DEV_MODE,
+          actions: debugActions 
+        } : {
+          success: true,
+          updated: false
+        };
+      }
+      tpFilledIRL = tpStatus.status === 'closed';
     }
 
-    return { 
+    // Check unfilled SO orders
+    const unfilledSOs = deal.orders.filter(o => 
+      o.type === OrderType.SAFETY && o.status !== OrderStatus.FILLED
+    );
+
+    // Count how many SOs are filled IRL
+    let soFilledCount = 0;
+    for (const so of unfilledSOs) {
+      const orderStatus = await exchange.fetchOrder(so.exchangeOrderId, deal.bot.pair.symbol) as ExchangeOrder;
+      if (orderStatus.status === 'canceled') {
+        if (!DEV_MODE) {
+          await prisma.deal.update({
+            where: { id: deal.id },
+            data: { status: DealStatus.FAILED }
+          });
+        }
+        return DEV_MODE ? { 
+          success: true, 
+          updated: false,
+          DEV_MODE,
+          actions: debugActions 
+        } : {
+          success: true,
+          updated: false
+        };
+      }
+      if (orderStatus.status === 'closed') {
+        soFilledCount++;
+      }
+    }
+
+    // Determine state of play
+    let stateOfPlay = 4; // Default to "do nothing"
+    
+    if (soFilledCount > 0 && tpFilledIRL) {
+      stateOfPlay = 1;
+      await handleState1(deal, exchange, debugActions);
+    } else if (soFilledCount > 0 && !tpFilledIRL) {
+      stateOfPlay = 2;
+      await handleState2(deal, exchange, debugActions);
+    } else if (soFilledCount === 0 && tpFilledIRL) {
+      stateOfPlay = 3;
+      await handleState3(deal, exchange, debugActions);
+    }
+
+    return DEV_MODE ? { 
       success: true, 
-      updated: needNewTP,
+      updated: stateOfPlay !== 4,
       DEV_MODE,
       actions: debugActions 
+    } : {
+      success: true,
+      updated: stateOfPlay !== 4
     };
 
   } catch (error) {
@@ -446,16 +669,7 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
-
-    /*if (DEV_MODE) {
-      console.log ("dev mode");
-      return;
-    } else {
-      console.log ("no dev mode");
-      return;
-    }*/
-
-    const {id} = await params;
+    const { id } = await params;
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
@@ -496,4 +710,15 @@ export async function POST(
       { status: 500 }
     );
   }
-} 
+}
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Methods': 'POST',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
+}
+

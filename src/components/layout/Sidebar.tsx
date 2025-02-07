@@ -52,17 +52,13 @@ const navigation = [
     children: [
       { name: 'My Bots', href: '/dashboard/bots' },
       { name: 'My Deals', href: '/dashboard/deals' },
+      { name: 'My Orders', href: '/dashboard/orders' }
     ]
   },
   {
     name: 'Exchanges',
     href: '/dashboard/exchanges',
     icon: ExchangesIcon,
-  },
-  {
-    name: 'Orders',
-    href: '/dashboard/orders',
-    icon: ListIcon,
   },
   {
     name: 'Settings',

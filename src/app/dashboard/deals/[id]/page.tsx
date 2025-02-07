@@ -217,7 +217,7 @@ export default function DealDetailsPage() {
       });
       const data = await response.json();
       
-      if (data.DEV_MODE && data.actions) {
+      if (data.DEV_MODE) {
         setDebugActions(data.actions);
         setShowDebugModal(true);
       } else if (data.success && data.updated) {

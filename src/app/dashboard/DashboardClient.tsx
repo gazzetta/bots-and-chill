@@ -8,6 +8,7 @@ import Brightness7Icon from '@mui/icons-material/Brightness7';
 import { UserButton } from '@clerk/nextjs';
 import { useColorMode } from '@/hooks/useColorMode';
 import Sidebar from '@/components/layout/Sidebar';
+import { useStore } from '@/lib/store';
 
 const DRAWER_WIDTH = 240;
 
@@ -19,14 +20,30 @@ export default function DashboardClient({
   const { toggleColorMode, mode } = useColorMode();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const { initialized, setInitialized } = useStore();
 
   useEffect(() => {
-    fetch('/api/init').catch(console.error);
+    const initializeApp = async () => {
+      if (initialized) return;
+      
+      try {
+        const response = await fetch('/api/init');
+        if (response.ok) {
+          setInitialized(true);
+        }
+      } catch (error) {
+        console.error('Failed to initialize:', error);
+      }
+    };
+
+    initializeApp();
 
     return () => {
-      fetch('/api/websocket/cleanup', { method: 'POST' }).catch(console.error);
+      if (initialized) {
+        fetch('/api/websocket/cleanup', { method: 'POST' }).catch(console.error);
+      }
     };
-  }, []);
+  }, [initialized, setInitialized]);
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
