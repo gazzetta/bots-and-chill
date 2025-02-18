@@ -1,10 +1,91 @@
-
-> bots-and-chill@0.1.0 dev
-> next dev
-
    ▲ Next.js 15.0.3
-   - Local:        http://localhost:3000
+   - Local:        http://localhost:3002
    - Environments: .env
 
  ✓ Starting...
- ✓ Ready in 4.8s
+ ✓ Ready in 3.3s
+ ○ Compiling /src/middleware ...
+ ✓ Compiled /src/middleware in 1568ms (208 modules)
+ ○ Compiling / ...
+ ✓ Compiled / in 15.4s (2044 modules)
+ GET / 200 in 16731ms
+ ○ Compiling /dashboard ...
+ ✓ Compiled /dashboard in 10.3s (2256 modules)
+prisma:query SELECT "public"."User"."id", "public"."User"."clerkId", "public"."User"."email", "public"."User"."createdAt", "public"."User"."updatedAt" FROM "public"."User" WHERE ("public"."User"."clerkId" = $1 AND 1=1) LIMIT $2 OFFSET $3
+ GET /dashboard 200 in 11234ms
+ ○ Compiling /api/init ...
+ ✓ Compiled /api/init in 2.6s (2405 modules)
+{
+  "type": "INFO",
+  "message": "All WebSocket connections disconnected",
+  "timestamp": "2025-02-08 11:52:53.592"
+}
+{
+  "type": "INFO",
+  "message": "All WebSocket connections disconnected",
+  "timestamp": "2025-02-08 11:52:53.594"
+}
+prisma:query SELECT "public"."ExchangeKey"."id", "public"."ExchangeKey"."userId", "public"."ExchangeKey"."exchange", "public"."ExchangeKey"."name", "public"."ExchangeKey"."apiKey", "public"."ExchangeKey"."apiSecret", "public"."ExchangeKey"."isTestnet", "public"."ExchangeKey"."createdAt", "public"."ExchangeKey"."updatedAt" FROM "public"."ExchangeKey" WHERE ("public"."ExchangeKey"."id") IN (SELECT "t1"."exchangeKeyId" FROM "public"."Bot" AS "t1" WHERE ("t1"."status" = CAST($1::text AS "public"."BotStatus") AND "t1"."exchangeKeyId" IS NOT NULL)) OFFSET $2
+ GET /api/init 200 in 3138ms
+{
+  "type": "INFO",
+  "message": "All WebSocket connections disconnected",
+  "timestamp": "2025-02-08 11:52:53.672"
+}
+{
+  "type": "INFO",
+  "message": "All WebSocket connections disconnected",
+  "timestamp": "2025-02-08 11:52:53.672"
+}
+prisma:query SELECT "public"."ExchangeKey"."id", "public"."ExchangeKey"."userId", "public"."ExchangeKey"."exchange", "public"."ExchangeKey"."name", "public"."ExchangeKey"."apiKey", "public"."ExchangeKey"."apiSecret", "public"."ExchangeKey"."isTestnet", "public"."ExchangeKey"."createdAt", "public"."ExchangeKey"."updatedAt" FROM "public"."ExchangeKey" WHERE ("public"."ExchangeKey"."id") IN (SELECT "t1"."exchangeKeyId" FROM "public"."Bot" AS "t1" WHERE ("t1"."status" = CAST($1::text AS "public"."BotStatus") AND "t1"."exchangeKeyId" IS NOT NULL)) OFFSET $2
+ GET /api/init 200 in 22ms
+prisma:query SELECT "public"."User"."id", "public"."User"."clerkId", "public"."User"."email", "public"."User"."createdAt", "public"."User"."updatedAt" FROM "public"."User" WHERE ("public"."User"."clerkId" = $1 AND 1=1) LIMIT $2 OFFSET $3
+ GET /dashboard 200 in 1096ms
+{
+  "type": "INFO",
+  "message": "All WebSocket connections disconnected",
+  "timestamp": "2025-02-08 17:52:20.654"
+}
+{
+  "type": "INFO",
+  "message": "All WebSocket connections disconnected",
+  "timestamp": "2025-02-08 17:52:20.656"
+}
+prisma:query SELECT "public"."ExchangeKey"."id", "public"."ExchangeKey"."userId", "public"."ExchangeKey"."exchange", "public"."ExchangeKey"."name", "public"."ExchangeKey"."apiKey", "public"."ExchangeKey"."apiSecret", "public"."ExchangeKey"."isTestnet", "public"."ExchangeKey"."createdAt", "public"."ExchangeKey"."updatedAt" FROM "public"."ExchangeKey" WHERE ("public"."ExchangeKey"."id") IN (SELECT "t1"."exchangeKeyId" FROM "public"."Bot" AS "t1" WHERE ("t1"."status" = CAST($1::text AS "public"."BotStatus") AND "t1"."exchangeKeyId" IS NOT NULL)) OFFSET $2
+ GET /api/init 200 in 46ms
+ ○ Compiling /dashboard/bots ...
+ ✓ Compiled /dashboard/bots in 2s (2450 modules)
+ GET /dashboard/bots 200 in 2236ms
+ ○ Compiling /api/bots ...
+ ✓ Compiled /api/bots in 631ms (2452 modules)
+prisma:query SELECT "public"."Bot"."id", "public"."Bot"."userId", "public"."Bot"."pairId", "public"."Bot"."baseOrderSize", "public"."Bot"."maxSafetyOrders", "public"."Bot"."priceDeviation", "public"."Bot"."safetyOrderSize", "public"."Bot"."safetyOrderPriceStep", "public"."Bot"."safetyOrderVolumeStep", "public"."Bot"."takeProfit", "public"."Bot"."mode", "public"."Bot"."createdAt", "public"."Bot"."updatedAt", "public"."Bot"."name", "public"."Bot"."exchangeKeyId", "public"."Bot"."status"::text FROM "public"."Bot" WHERE "public"."Bot"."userId" = $1 ORDER BY "public"."Bot"."createdAt" DESC OFFSET $2
+ GET /api/bots 200 in 796ms
+prisma:query SELECT "public"."Bot"."id", "public"."Bot"."userId", "public"."Bot"."pairId", "public"."Bot"."baseOrderSize", "public"."Bot"."maxSafetyOrders", "public"."Bot"."priceDeviation", "public"."Bot"."safetyOrderSize", "public"."Bot"."safetyOrderPriceStep", "public"."Bot"."safetyOrderVolumeStep", "public"."Bot"."takeProfit", "public"."Bot"."mode", "public"."Bot"."createdAt", "public"."Bot"."updatedAt", "public"."Bot"."name", "public"."Bot"."exchangeKeyId", "public"."Bot"."status"::text FROM "public"."Bot" WHERE "public"."Bot"."userId" = $1 ORDER BY "public"."Bot"."createdAt" DESC OFFSET $2
+ GET /api/bots 200 in 20ms
+ ○ Compiling /dashboard/exchanges ...
+ ✓ Compiled /dashboard/exchanges in 4.3s (2689 modules)
+ GET /dashboard/exchanges 200 in 4646ms
+ ○ Compiling /api/exchanges ...
+ ✓ Compiled /api/exchanges in 635ms (2691 modules)
+prisma:query SELECT 1
+prisma:query SELECT "public"."ExchangeKey"."id", "public"."ExchangeKey"."exchange", "public"."ExchangeKey"."name", "public"."ExchangeKey"."isTestnet", "public"."ExchangeKey"."createdAt", "public"."ExchangeKey"."updatedAt" FROM "public"."ExchangeKey" LEFT JOIN "public"."User" AS "j1" ON ("j1"."id") = ("public"."ExchangeKey"."userId") WHERE ("j1"."clerkId" = $1 AND ("j1"."id" IS NOT NULL)) OFFSET $2
+ GET /api/exchanges 200 in 742ms
+prisma:query SELECT "public"."ExchangeKey"."id", "public"."ExchangeKey"."exchange", "public"."ExchangeKey"."name", "public"."ExchangeKey"."isTestnet", "public"."ExchangeKey"."createdAt", "public"."ExchangeKey"."updatedAt" FROM "public"."ExchangeKey" LEFT JOIN "public"."User" AS "j1" ON ("j1"."id") = ("public"."ExchangeKey"."userId") WHERE ("j1"."clerkId" = $1 AND ("j1"."id" IS NOT NULL)) OFFSET $2
+ GET /api/exchanges 200 in 19ms
+prisma:query SELECT "public"."User"."id", "public"."User"."clerkId", "public"."User"."email", "public"."User"."createdAt", "public"."User"."updatedAt" FROM "public"."User" WHERE ("public"."User"."clerkId" = $1 AND 1=1) LIMIT $2 OFFSET $3
+ GET /dashboard/exchanges 200 in 1292ms
+prisma:query SELECT "public"."ExchangeKey"."id", "public"."ExchangeKey"."exchange", "public"."ExchangeKey"."name", "public"."ExchangeKey"."isTestnet", "public"."ExchangeKey"."createdAt", "public"."ExchangeKey"."updatedAt" FROM "public"."ExchangeKey" LEFT JOIN "public"."User" AS "j1" ON ("j1"."id") = ("public"."ExchangeKey"."userId") WHERE ("j1"."clerkId" = $1 AND ("j1"."id" IS NOT NULL)) OFFSET $2
+ GET /api/exchanges 200 in 68ms
+{
+  "type": "INFO",
+  "message": "All WebSocket connections disconnected",
+  "timestamp": "2025-02-10 10:59:44.864"
+}
+{
+  "type": "INFO",
+  "message": "All WebSocket connections disconnected",
+  "timestamp": "2025-02-10 10:59:44.866"
+}
+prisma:query SELECT "public"."ExchangeKey"."id", "public"."ExchangeKey"."userId", "public"."ExchangeKey"."exchange", "public"."ExchangeKey"."name", "public"."ExchangeKey"."apiKey", "public"."ExchangeKey"."apiSecret", "public"."ExchangeKey"."isTestnet", "public"."ExchangeKey"."createdAt", "public"."ExchangeKey"."updatedAt" FROM "public"."ExchangeKey" WHERE ("public"."ExchangeKey"."id") IN (SELECT "t1"."exchangeKeyId" FROM "public"."Bot" AS "t1" WHERE ("t1"."status" = CAST($1::text AS "public"."BotStatus") AND "t1"."exchangeKeyId" IS NOT NULL)) OFFSET $2
+ GET /api/init 200 in 211ms
+^C
